@@ -59,7 +59,13 @@
 }
 
 .cell.today:not(.empty) {
-  box-shadow: 0 0 0 1px var(--text) inset;
+  box-shadow: 0 0 0 1px #fff inset;
+}
+
+.cell.today.active {
+  background: var(--accent);
+  border: 2px solid #fff;
+  box-shadow: none;
 }
 
 .cell.future {

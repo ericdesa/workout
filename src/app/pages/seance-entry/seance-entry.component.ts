@@ -98,6 +98,11 @@ export class SeanceEntryComponent implements OnInit {
     row.sets.splice(i, 1);
   }
 
+  private todayIso(): string {
+    const d = new Date();
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+  }
+
   async enregistrer(): Promise<void> {
     const exercices: ExerciseLog[] = this.rows.map((r) => ({
       exerciceId: r.exerciceId,
@@ -114,7 +119,7 @@ export class SeanceEntryComponent implements OnInit {
 
     const session: SessionLog = {
       id: crypto.randomUUID(),
-      date: new Date().toISOString().slice(0, 10),
+      date: this.todayIso(),
       seanceCode: this.code,
       exercices,
       notes: this.notes.trim()
