@@ -10,8 +10,8 @@
     <span class="target">{{ row.seriesCible }} × {{ row.repsLabel }} · repos {{ row.reposLabel }}</span>
   </div>
   <p class="last-time">🕓 Dernière fois : {{ dernierResume(row) }}</p>
-  <p class="last-comment muted" *ngIf="row.dernier?.log?.commentaire">
-    « {{ row.dernier?.log?.commentaire }} »
+  <p class="last-comment muted" *ngIf="row.dernier?.log.commentaire">
+    « {{ row.dernier.log.commentaire }} »
   </p>
 
   <ng-container *ngIf="row.type === 'musculation'; else cardioBlock">

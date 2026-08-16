@@ -6,7 +6,7 @@ export const routes: Routes = [
     path: 'login',
     loadComponent: () => import('./pages/login/login.component').then((m) => m.LoginComponent)
   },
-  { path: '', redirectTo: 'accueil', pathMatch: 'full', canMatch: [authGuard] },
+  { path: '', redirectTo: 'accueil', pathMatch: 'full' },
   {
     path: 'accueil',
     loadComponent: () => import('./pages/seance-select/seance-select.component').then((m) => m.SeanceSelectComponent),
