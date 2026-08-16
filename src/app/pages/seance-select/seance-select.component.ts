@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, computed } from '@angular/core';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { StorageService } from '../../services/storage.service';
 import { PROGRAM } from '../../data/program';
 import { SeanceCode } from '../../models/fitness.model';
@@ -8,7 +8,7 @@ import { SeanceCode } from '../../models/fitness.model';
 @Component({
   selector: 'app-seance-select',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, RouterLink],
   templateUrl: './seance-select.component.html',
   styleUrl: './seance-select.component.css'
 })

@@ -18,9 +18,13 @@
 
 <div class="card" *ngIf="dernieresSessions().length">
   <h3>Dernières séances</h3>
-  <div class="recent-row" *ngFor="let s of dernieresSessions()">
+  <a
+    class="recent-row"
+    *ngFor="let s of dernieresSessions()"
+    [routerLink]="['/session', s.id]"
+  >
     <span class="pill">{{ s.seanceCode }}</span>
     <span>{{ dateCourte(s.date) }}</span>
     <span class="muted">{{ s.exercices.length }} exercices notés</span>
-  </div>
+  </a>
 </div>
