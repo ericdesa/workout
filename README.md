@@ -27,32 +27,6 @@ npm run build
 # fichiers générés dans dist/fitness-tracker/browser
 ```
 
-## Déploiement sur GitHub Pages
-
-Un workflow GitHub Actions est déjà présent :
-`.github/workflows/deploy.yml`.
-
-1. Crée un dépôt GitHub (par ex. `suivi-salle`) et pousse ce projet dessus :
-   ```bash
-   git init
-   git add .
-   git commit -m "Initial commit"
-   git branch -M main
-   git remote add origin https://github.com/<ton-user>/<ton-repo>.git
-   git push -u origin main
-   ```
-2. Dans les réglages du dépôt GitHub → **Settings → Pages**, choisis
-   **Source: GitHub Actions**.
-3. Chaque push sur `main` relance automatiquement le build et publie le site
-   (le workflow utilise `--base-href "/<nom-du-repo>/"`, donc aucune
-   configuration manuelle n'est nécessaire).
-4. L'URL sera de la forme `https://<ton-user>.github.io/<ton-repo>/`.
-
-Le fichier `index.html` est dupliqué en `404.html` au moment du build : cela
-permet aux routes Angular (`/historique`, `/session/...`, etc.) de fonctionner
-même en rechargeant la page ou en y accédant directement, ce que GitHub Pages
-ne gère pas nativement (pas de routing serveur).
-
 ## Sauvegarde des données
 
 Les données ne vivent que dans le `localStorage` du navigateur utilisé : si tu
