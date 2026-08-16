@@ -2,7 +2,7 @@
   "name": "Workout",
   "short_name": "Workout",
   "description": "Suivi de séances de sport en salle",
-  "start_url": "/accueil",
+  "start_url": "/",
   "display": "standalone",
   "background_color": "#0f1115",
   "theme_color": "#4fd1a0",
