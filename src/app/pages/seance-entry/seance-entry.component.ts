@@ -133,6 +133,13 @@ export class SeanceEntryComponent implements OnInit, OnDestroy {
     await this.storage.saveSession(session);
   }
 
+  isDone(row: ExerciseFormRow): boolean {
+    if (row.type === 'cardio') {
+      return row.distance != null || row.duration != null;
+    }
+    return row.sets.some((s) => s.kg != null || s.reps != null);
+  }
+
   dernierResume(row: ExerciseFormRow): string {
     if (!row.dernier) return 'Pas encore fait';
     const d = new Date(row.dernier.date).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short' });

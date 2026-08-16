@@ -38,6 +38,11 @@
 
 .exercise-card {
   padding: 14px 16px;
+  transition: border-color 0.2s;
+}
+
+.exercise-done {
+  border-left: 3px solid var(--accent);
 }
 
 .exercise-head {

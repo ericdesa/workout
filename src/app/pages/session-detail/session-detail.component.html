@@ -24,7 +24,7 @@
   </div>
 
   @for (ex of s.exercices; track ex.exerciceId; let ri = $index) {
-    <div class="card exercise-card">
+    <div class="card exercise-card" [class.exercise-done]="isDone(ex)">
       <div class="exercise-head">
         <h2>{{ ex.exerciceNom }}</h2>
         <div class="exercise-head-right">

@@ -75,6 +75,13 @@ export class SessionDetailComponent implements OnInit, OnDestroy {
     }
   }
 
+  isDone(ex: ExerciseLog): boolean {
+    if (this.isCardio(ex)) {
+      return ex.distance != null || ex.duration != null;
+    }
+    return ex.sets.some((s) => s.kg != null || s.reps != null);
+  }
+
   isCardio(ex: ExerciseLog): boolean {
     if (ex.exerciceId.startsWith('custom-')) {
       return ex.distance != null || ex.duration != null;

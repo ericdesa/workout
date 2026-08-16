@@ -18,7 +18,7 @@
 </div>
 
 @for (row of rows; track row.exerciceId; let ri = $index) {
-  <div class="card exercise-card">
+  <div class="card exercise-card" [class.exercise-done]="isDone(row)">
     <div class="exercise-head">
       <h2>{{ row.exerciceNom }}</h2>
       <div class="exercise-head-actions">
