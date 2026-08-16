@@ -80,7 +80,7 @@ export class SeanceEntryComponent implements OnInit {
     row.sets.splice(i, 1);
   }
 
-  enregistrer(): void {
+  async enregistrer(): Promise<void> {
     const exercices: ExerciseLog[] = this.rows.map((r) => ({
       exerciceId: r.exerciceId,
       exerciceNom: r.exerciceNom,
@@ -98,7 +98,7 @@ export class SeanceEntryComponent implements OnInit {
       notes: this.notes.trim()
     };
 
-    this.storage.saveSession(session);
+    await this.storage.saveSession(session);
     this.router.navigate(['/session', session.id]);
   }
 }

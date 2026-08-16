@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { StorageService } from '../../services/storage.service';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-reglages',
@@ -12,11 +13,12 @@ import { StorageService } from '../../services/storage.service';
 })
 export class ReglagesComponent {
   readonly nbSessions = () => this.storage.sessions().length;
+  readonly userEmail = () => this.auth.user()?.email ?? '';
   message = signal<string | null>(null);
   confirmReset = false;
   modeImport: 'fusionner' | 'remplacer' = 'fusionner';
 
-  constructor(private storage: StorageService) {}
+  constructor(private storage: StorageService, public auth: AuthService) {}
 
   private fileName(): string {
     const d = new Date().toISOString().slice(0, 10);
@@ -68,8 +70,8 @@ export class ReglagesComponent {
     const file = input.files?.[0];
     if (!file) return;
     const reader = new FileReader();
-    reader.onload = () => {
-      const result = this.storage.importJson(String(reader.result), this.modeImport);
+    reader.onload = async () => {
+      const result = await this.storage.importJson(String(reader.result), this.modeImport);
       if (result.ok) {
         this.message.set(`Import réussi : ${result.count} séance(s) traitée(s).`);
       } else {
@@ -84,5 +86,9 @@ export class ReglagesComponent {
     this.storage.clearAll();
     this.confirmReset = false;
     this.message.set('Toutes les données ont été supprimées.');
+  }
+
+  async deconnexion(): Promise<void> {
+    await this.auth.signOut();
   }
 }

@@ -1,30 +1,41 @@
 import { Routes } from '@angular/router';
+import { authGuard } from './guards/auth.guard';
 
 export const routes: Routes = [
-  { path: '', redirectTo: 'accueil', pathMatch: 'full' },
+  {
+    path: 'login',
+    loadComponent: () => import('./pages/login/login.component').then((m) => m.LoginComponent)
+  },
+  { path: '', redirectTo: 'accueil', pathMatch: 'full', canMatch: [authGuard] },
   {
     path: 'accueil',
-    loadComponent: () => import('./pages/seance-select/seance-select.component').then((m) => m.SeanceSelectComponent)
+    loadComponent: () => import('./pages/seance-select/seance-select.component').then((m) => m.SeanceSelectComponent),
+    canMatch: [authGuard]
   },
   {
     path: 'seance/:code',
-    loadComponent: () => import('./pages/seance-entry/seance-entry.component').then((m) => m.SeanceEntryComponent)
+    loadComponent: () => import('./pages/seance-entry/seance-entry.component').then((m) => m.SeanceEntryComponent),
+    canMatch: [authGuard]
   },
   {
     path: 'historique',
-    loadComponent: () => import('./pages/history/history.component').then((m) => m.HistoryComponent)
+    loadComponent: () => import('./pages/history/history.component').then((m) => m.HistoryComponent),
+    canMatch: [authGuard]
   },
   {
     path: 'session/:id',
-    loadComponent: () => import('./pages/session-detail/session-detail.component').then((m) => m.SessionDetailComponent)
+    loadComponent: () => import('./pages/session-detail/session-detail.component').then((m) => m.SessionDetailComponent),
+    canMatch: [authGuard]
   },
   {
     path: 'programme',
-    loadComponent: () => import('./pages/programme/programme.component').then((m) => m.ProgrammeComponent)
+    loadComponent: () => import('./pages/programme/programme.component').then((m) => m.ProgrammeComponent),
+    canMatch: [authGuard]
   },
   {
     path: 'reglages',
-    loadComponent: () => import('./pages/reglages/reglages.component').then((m) => m.ReglagesComponent)
+    loadComponent: () => import('./pages/reglages/reglages.component').then((m) => m.ReglagesComponent),
+    canMatch: [authGuard]
   },
   { path: '**', redirectTo: 'accueil' }
 ];

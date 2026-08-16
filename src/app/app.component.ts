@@ -1,11 +1,33 @@
-import { Component } from '@angular/core';
+import { Component, computed } from '@angular/core';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+import { CommonModule } from '@angular/common';
+import { AuthService } from './services/auth.service';
+import { StorageService } from './services/storage.service';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, RouterLink, RouterLinkActive],
+  imports: [RouterOutlet, RouterLink, RouterLinkActive, CommonModule],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css'
 })
-export class AppComponent {}
+export class AppComponent {
+  readonly userEmail = computed(() => this.auth.user()?.email ?? null);
+
+  constructor(public auth: AuthService, private storage: StorageService) {
+    this.auth['supabase'].client.auth.onAuthStateChange(async (_event, session) => {
+      if (session?.user) {
+        await this.storage.loadSessions();
+      }
+    });
+
+    if (this.auth.isLoggedIn()) {
+      this.storage.loadSessions();
+    }
+  }
+
+  async logout(): Promise<void> {
+    await this.auth.signOut();
+    this.storage.sessions.set([]);
+  }
+}

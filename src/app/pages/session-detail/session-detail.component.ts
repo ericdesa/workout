@@ -30,7 +30,6 @@ export class SessionDetailComponent implements OnInit {
       this.notFound = true;
       return;
     }
-    // copie profonde pour édition locale
     this.session = JSON.parse(JSON.stringify(found));
   }
 
@@ -43,15 +42,15 @@ export class SessionDetailComponent implements OnInit {
     ex.sets.splice(i, 1);
   }
 
-  enregistrer(): void {
+  async enregistrer(): Promise<void> {
     if (!this.session) return;
-    this.storage.saveSession(this.session);
+    await this.storage.saveSession(this.session);
     this.router.navigate(['/historique']);
   }
 
-  supprimer(): void {
+  async supprimer(): Promise<void> {
     if (!this.session) return;
-    this.storage.deleteSession(this.session.id);
+    await this.storage.deleteSession(this.session.id);
     this.router.navigate(['/historique']);
   }
 

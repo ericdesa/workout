@@ -1,47 +1,75 @@
 import { Injectable, signal } from '@angular/core';
-import { FitnessData, SessionLog } from '../models/fitness.model';
-
-const STORAGE_KEY = 'fitness_tracker_data_v1';
+import { SessionLog } from '../models/fitness.model';
+import { SupabaseService } from './supabase.service';
+import { AuthService } from './auth.service';
 
 @Injectable({ providedIn: 'root' })
 export class StorageService {
-  readonly sessions = signal<SessionLog[]>(this.load().sessions);
+  readonly sessions = signal<SessionLog[]>([]);
 
-  private load(): FitnessData {
-    try {
-      const raw = localStorage.getItem(STORAGE_KEY);
-      if (!raw) return { version: 1, sessions: [] };
-      const parsed = JSON.parse(raw) as FitnessData;
-      if (!parsed.sessions) return { version: 1, sessions: [] };
-      return parsed;
-    } catch {
-      return { version: 1, sessions: [] };
-    }
+  constructor(private supabase: SupabaseService, private auth: AuthService) {}
+
+  private uid(): string {
+    const id = this.auth.userId;
+    if (!id) throw new Error('Non authentifié');
+    return id;
   }
 
-  private persist(sessions: SessionLog[]): void {
-    const data: FitnessData = { version: 1, sessions };
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-    this.sessions.set(sessions);
+  async loadSessions(): Promise<void> {
+    const { data, error } = await this.supabase.client
+      .from('sessions')
+      .select('*')
+      .eq('user_id', this.uid())
+      .order('date', { ascending: false });
+    if (error) throw error;
+    this.sessions.set(
+      (data ?? []).map((row: any) => ({
+        id: row.id,
+        date: row.date,
+        seanceCode: row.seance_code,
+        exercices: row.exercices,
+        notes: row.notes
+      }))
+    );
   }
 
-  saveSession(session: SessionLog): void {
+  async saveSession(session: SessionLog): Promise<void> {
+    const { error } = await this.supabase.client.from('sessions').upsert(
+      {
+        id: session.id,
+        user_id: this.uid(),
+        date: session.date,
+        seance_code: session.seanceCode,
+        exercices: session.exercices,
+        notes: session.notes
+      },
+      { onConflict: 'id' }
+    );
+    if (error) throw error;
     const current = this.sessions();
     const idx = current.findIndex((s) => s.id === session.id);
-    const next = idx >= 0 ? [...current.slice(0, idx), session, ...current.slice(idx + 1)] : [...current, session];
+    const next =
+      idx >= 0
+        ? [...current.slice(0, idx), session, ...current.slice(idx + 1)]
+        : [...current, session];
     next.sort((a, b) => (a.date < b.date ? 1 : -1));
-    this.persist(next);
+    this.sessions.set(next);
   }
 
-  deleteSession(id: string): void {
-    this.persist(this.sessions().filter((s) => s.id !== id));
+  async deleteSession(id: string): Promise<void> {
+    const { error } = await this.supabase.client
+      .from('sessions')
+      .delete()
+      .eq('id', id)
+      .eq('user_id', this.uid());
+    if (error) throw error;
+    this.sessions.set(this.sessions().filter((s) => s.id !== id));
   }
 
   getSession(id: string): SessionLog | undefined {
     return this.sessions().find((s) => s.id === id);
   }
 
-  /** Dernier log enregistré pour un exercice donné, avant une date/session donnée (exclue). */
   getLastExerciseLog(exerciceId: string, excludeSessionId?: string) {
     const sessions = this.sessions().filter((s) => s.id !== excludeSessionId);
     for (const session of sessions) {
@@ -54,12 +82,15 @@ export class StorageService {
   }
 
   exportJson(): string {
-    const data: FitnessData = { version: 1, sessions: this.sessions() };
+    const data = { version: 1, sessions: this.sessions() };
     return JSON.stringify(data, null, 2);
   }
 
-  importJson(raw: string, mode: 'remplacer' | 'fusionner'): { ok: true; count: number } | { ok: false; error: string } {
-    let parsed: FitnessData;
+  async importJson(
+    raw: string,
+    mode: 'remplacer' | 'fusionner'
+  ): Promise<{ ok: true; count: number } | { ok: false; error: string }> {
+    let parsed: { version: number; sessions: SessionLog[] };
     try {
       parsed = JSON.parse(raw);
     } catch {
@@ -68,19 +99,33 @@ export class StorageService {
     if (!parsed || !Array.isArray(parsed.sessions)) {
       return { ok: false, error: "Le fichier ne contient pas de séances valides." };
     }
+
     if (mode === 'remplacer') {
-      this.persist(parsed.sessions);
-      return { ok: true, count: parsed.sessions.length };
+      await this.supabase.client.from('sessions').delete().eq('user_id', this.uid());
     }
-    const current = this.sessions();
-    const byId = new Map(current.map((s) => [s.id, s]));
-    for (const s of parsed.sessions) byId.set(s.id, s);
-    const merged = Array.from(byId.values()).sort((a, b) => (a.date < b.date ? 1 : -1));
-    this.persist(merged);
+
+    const rows = parsed.sessions.map((s) => ({
+      id: s.id,
+      user_id: this.uid(),
+      date: s.date,
+      seance_code: s.seanceCode,
+      exercices: s.exercices,
+      notes: s.notes
+    }));
+
+    const { error } = await this.supabase.client.from('sessions').upsert(rows, { onConflict: 'id' });
+    if (error) return { ok: false, error: error.message };
+
+    await this.loadSessions();
     return { ok: true, count: parsed.sessions.length };
   }
 
-  clearAll(): void {
-    this.persist([]);
+  async clearAll(): Promise<void> {
+    const { error } = await this.supabase.client
+      .from('sessions')
+      .delete()
+      .eq('user_id', this.uid());
+    if (error) throw error;
+    this.sessions.set([]);
   }
 }

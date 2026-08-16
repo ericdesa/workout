@@ -1,0 +1,32 @@
+<div class="login-wrapper">
+  <div class="login-card">
+    <div class="logo-big">🏋️</div>
+    <h1>Ma salle</h1>
+    <p class="muted">Connecte-toi pour synchroniser tes séances.</p>
+
+    <div *ngIf="!auth.emailSent(); else sentBlock">
+      <form (ngSubmit)="onSubmit()">
+        <input
+          type="email"
+          placeholder="ton@email.com"
+          [(ngModel)]="email"
+          name="email"
+          required
+          class="email-input"
+        />
+        <p class="error" *ngIf="auth.error()">{{ auth.error() }}</p>
+        <button type="submit" class="btn btn-primary btn-block" [disabled]="auth.loading()">
+          Recevoir le lien magique
+        </button>
+      </form>
+      <p class="hint">Pas de mot de passe : un lien de connexion t sera envoyé par email.</p>
+    </div>
+
+    <ng-template #sentBlock>
+      <div class="sent-notice">
+        <p>📧 <strong>Lien envoyé !</strong></p>
+        <p class="muted">Vérifie ta boîte mail et clique sur le lien pour te connecter.</p>
+      </div>
+    </ng-template>
+  </div>
+</div>

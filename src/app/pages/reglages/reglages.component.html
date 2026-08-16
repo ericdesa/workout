@@ -1,5 +1,11 @@
 <h1>Réglages</h1>
-<p class="muted">{{ nbSessions() }} séance(s) enregistrée(s) — données stockées uniquement sur cet appareil (localStorage).</p>
+<p class="muted">{{ nbSessions() }} séance(s) enregistrée(s) — données synchronisées avec le cloud.</p>
+
+<div class="card">
+  <h3>Compte</h3>
+  <p>Connecté en tant que <strong>{{ userEmail() }}</strong></p>
+  <button type="button" class="btn btn-block" (click)="deconnexion()">Se déconnecter</button>
+</div>
 
 <div class="card">
   <h3>Exporter</h3>
@@ -23,7 +29,7 @@
 
 <div class="card">
   <h3>Réinitialiser</h3>
-  <p>Supprime définitivement toutes les séances enregistrées sur cet appareil.</p>
+  <p>Supprime définitivement toutes les séances enregistrées dans le cloud.</p>
   <button type="button" class="btn btn-danger btn-block" *ngIf="!confirmReset" (click)="confirmReset = true">Tout supprimer</button>
   <div class="confirm-row" *ngIf="confirmReset">
     <span class="muted">Confirmer ?</span>
