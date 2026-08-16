@@ -24,7 +24,7 @@ npm start        # http://localhost:4200
 
 ```bash
 npm run build
-# fichiers générés dans dist/fitness-tracker/browser
+# fichiers générés dans dist/workout/browser
 ```
 
 ## Sauvegarde des données
