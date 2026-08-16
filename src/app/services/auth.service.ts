@@ -30,7 +30,11 @@ export class AuthService {
   async signIn(email: string): Promise<void> {
     this._error.set(null);
     this._emailSent.set(false);
-    const { error } = await this.supabase.client.auth.signInWithOtp({ email });
+    const baseHref = document.querySelector('base')?.getAttribute('href') ?? '/';
+    const { error } = await this.supabase.client.auth.signInWithOtp({
+      email,
+      options: { emailRedirectTo: `${location.origin}${baseHref}` }
+    });
     if (error) {
       this._error.set(error.message);
     } else {
