@@ -1,26 +1,30 @@
 <div class="graph-wrap">
   <div class="graph" [style.gridTemplateColumns]="'repeat(' + totalCols + ', 11px)'">
-    <span
-      *ngFor="let m of monthLabels"
-      class="month-label"
-      [style.gridColumn]="m.col"
-    >{{ m.name }}</span>
+    @for (m of monthLabels; track m.col) {
+      <span
+        class="month-label"
+        [style.gridColumn]="m.col"
+      >{{ m.name }}</span>
+    }
   </div>
 
   <div class="graph-body">
     <div class="day-labels">
-      <span *ngFor="let j of jours">{{ j }}</span>
+      @for (j of jours; track j) {
+        <span>{{ j }}</span>
+      }
     </div>
     <div class="grid" [style.gridTemplateColumns]="'repeat(' + totalCols + ', 11px)'">
-      <div
-        *ngFor="let cell of days"
-        class="cell"
-        [class.empty]="!cell.date"
-        [class.active]="cell.active"
-        [class.future]="cell.isFuture"
-        [class.today]="cell.isToday"
-        [title]="tooltip(cell)"
-      ></div>
+      @for (cell of days; track cell.date) {
+        <div
+          class="cell"
+          [class.empty]="!cell.date"
+          [class.active]="cell.active"
+          [class.future]="cell.isFuture"
+          [class.today]="cell.isToday"
+          [title]="tooltip(cell)"
+        ></div>
+      }
     </div>
   </div>
 

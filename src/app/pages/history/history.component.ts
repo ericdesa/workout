@@ -1,4 +1,3 @@
-import { CommonModule } from '@angular/common';
 import { Component, computed, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { StorageService } from '../../services/storage.service';
@@ -7,7 +6,7 @@ import { ContributionGraphComponent } from '../../components/contribution-graph/
 @Component({
   selector: 'app-history',
   standalone: true,
-  imports: [CommonModule, RouterLink, ContributionGraphComponent],
+  imports: [RouterLink, ContributionGraphComponent],
   templateUrl: './history.component.html',
   styleUrl: './history.component.css'
 })

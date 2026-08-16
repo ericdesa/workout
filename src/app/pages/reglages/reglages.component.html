@@ -30,12 +30,18 @@
 <div class="card">
   <h3>Réinitialiser</h3>
   <p>Supprime définitivement toutes les séances enregistrées dans le cloud.</p>
-  <button type="button" class="btn btn-danger btn-block" *ngIf="!confirmReset" (click)="confirmReset = true">Tout supprimer</button>
-  <div class="confirm-row" *ngIf="confirmReset">
-    <span class="muted">Confirmer ?</span>
-    <button type="button" class="btn btn-danger" (click)="reinitialiser()">Oui, supprimer</button>
-    <button type="button" class="btn" (click)="confirmReset = false">Annuler</button>
-  </div>
+  @if (!confirmReset) {
+    <button type="button" class="btn btn-danger btn-block" (click)="confirmReset = true">Tout supprimer</button>
+  }
+  @if (confirmReset) {
+    <div class="confirm-row">
+      <span class="muted">Confirmer ?</span>
+      <button type="button" class="btn btn-danger" (click)="reinitialiser()">Oui, supprimer</button>
+      <button type="button" class="btn" (click)="confirmReset = false">Annuler</button>
+    </div>
+  }
 </div>
 
-<p class="message" *ngIf="message()">{{ message() }}</p>
+@if (message()) {
+  <p class="message">{{ message() }}</p>
+}

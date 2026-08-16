@@ -1,4 +1,3 @@
-import { CommonModule } from '@angular/common';
 import { Component, Input, OnChanges } from '@angular/core';
 
 interface DayCell {
@@ -20,7 +19,7 @@ const JOURS_COURT = ['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam'];
 @Component({
   selector: 'app-contribution-graph',
   standalone: true,
-  imports: [CommonModule],
+  imports: [],
   templateUrl: './contribution-graph.component.html',
   styleUrl: './contribution-graph.component.css'
 })

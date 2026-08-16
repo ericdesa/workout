@@ -2,29 +2,35 @@
 <p>Suggestion basée sur ta rotation A → B → C.</p>
 
 <div class="seance-grid">
-  <button
-    *ngFor="let s of program()"
-    type="button"
-    class="seance-card"
-    [class.suggested]="s.code === suggestion()"
-    (click)="demarrer(s.code)"
-  >
-    <span class="code">{{ s.code }}</span>
-    <span class="label">{{ s.label }}</span>
-    <span class="count">{{ s.exercices.length }} exercices</span>
-    <span class="badge" *ngIf="s.code === suggestion()">Suggérée</span>
-  </button>
+  @for (s of program(); track s.code) {
+    <button
+      type="button"
+      class="seance-card"
+      [class.suggested]="s.code === suggestion()"
+      (click)="demarrer(s.code)"
+    >
+      <span class="code">{{ s.code }}</span>
+      <span class="label">{{ s.label }}</span>
+      <span class="count">{{ s.exercices.length }} exercices</span>
+      @if (s.code === suggestion()) {
+        <span class="badge">Suggérée</span>
+      }
+    </button>
+  }
 </div>
 
-<div class="card" *ngIf="dernieresSessions().length">
-  <h3>Dernières séances</h3>
-  <a
-    class="recent-row"
-    *ngFor="let s of dernieresSessions()"
-    [routerLink]="['/session', s.id]"
-  >
-    <span class="pill">{{ s.seanceCode }}</span>
-    <span>{{ dateCourte(s.date) }}</span>
-    <span class="muted">{{ s.exercices.length }} exercices notés</span>
-  </a>
-</div>
+@if (dernieresSessions().length) {
+  <div class="card">
+    <h3>Dernières séances</h3>
+    @for (s of dernieresSessions(); track s.id) {
+      <a
+        class="recent-row"
+        [routerLink]="['/session', s.id]"
+      >
+        <span class="pill">{{ s.seanceCode }}</span>
+        <span>{{ dateCourte(s.date) }}</span>
+        <span class="muted">{{ s.exercices.length }} exercices notés</span>
+      </a>
+    }
+  </div>
+}

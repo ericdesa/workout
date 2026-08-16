@@ -7,12 +7,14 @@
       <a routerLink="/programme" routerLinkActive="active">Programme</a>
       <a routerLink="/reglages" routerLinkActive="active">Réglages</a>
     </nav>
-    <div class="user-info" *ngIf="userEmail()">
-      <span class="user-email">{{ userEmail() }}</span>
-      <button type="button" class="btn btn-logout" (click)="logout()">
-        Déconnexion
-      </button>
-    </div>
+    @if (userEmail()) {
+      <div class="user-info">
+        <span class="user-email">{{ userEmail() }}</span>
+        <button type="button" class="btn btn-logout" (click)="logout()">
+          Déconnexion
+        </button>
+      </div>
+    }
   </header>
 
   <main class="content">

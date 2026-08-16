@@ -1,4 +1,3 @@
-import { CommonModule } from '@angular/common';
 import { Component, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { StorageService } from '../../services/storage.service';
@@ -7,7 +6,7 @@ import { AuthService } from '../../services/auth.service';
 @Component({
   selector: 'app-reglages',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [FormsModule],
   templateUrl: './reglages.component.html',
   styleUrl: './reglages.component.css'
 })

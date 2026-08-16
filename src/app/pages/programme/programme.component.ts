@@ -1,4 +1,3 @@
-import { CommonModule } from '@angular/common';
 import { Component, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { StorageService } from '../../services/storage.service';
@@ -8,7 +7,7 @@ import { ProgramExercise, ProgramSeance, ExerciseType } from '../../models/fitne
 @Component({
   selector: 'app-programme',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [FormsModule],
   templateUrl: './programme.component.html',
   styleUrl: './programme.component.css'
 })

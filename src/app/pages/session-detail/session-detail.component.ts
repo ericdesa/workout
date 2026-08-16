@@ -1,4 +1,3 @@
-import { CommonModule } from '@angular/common';
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
@@ -8,7 +7,7 @@ import { DIFFICULTE_LABELS, Difficulte, ExerciseLog, ExerciseType, ProgramExerci
 @Component({
   selector: 'app-session-detail',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [FormsModule, RouterLink],
   templateUrl: './session-detail.component.html',
   styleUrl: './session-detail.component.css'
 })

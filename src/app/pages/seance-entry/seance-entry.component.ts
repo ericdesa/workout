@@ -1,4 +1,4 @@
-import { CommonModule, DatePipe } from '@angular/common';
+import { DatePipe } from '@angular/common';
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
@@ -35,7 +35,7 @@ interface AddExercisePicker {
 @Component({
   selector: 'app-seance-entry',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [DatePipe, FormsModule, RouterLink],
   templateUrl: './seance-entry.component.html',
   styleUrl: './seance-entry.component.css'
 })
