@@ -2,7 +2,6 @@ import { CommonModule } from '@angular/common';
 import { Component, computed } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { StorageService } from '../../services/storage.service';
-import { PROGRAM } from '../../data/program';
 import { SeanceCode } from '../../models/fitness.model';
 
 @Component({
@@ -13,26 +12,28 @@ import { SeanceCode } from '../../models/fitness.model';
   styleUrl: './seance-select.component.css'
 })
 export class SeanceSelectComponent {
-  readonly program = PROGRAM;
+  readonly program = computed(() => this.storage.program());
 
   readonly derniereSeance = computed<SeanceCode | null>(() => {
     const sessions = this.storage.sessions();
     return sessions.length ? sessions[0].seanceCode : null;
   });
 
-  readonly suggestion = computed<SeanceCode>(() => {
+  readonly suggestion = computed(() => {
     const derniere = this.derniereSeance();
-    if (!derniere) return 'A';
-    const ordre: SeanceCode[] = ['A', 'B', 'C'];
-    const idx = ordre.indexOf(derniere);
-    return ordre[(idx + 1) % ordre.length];
+    const prog = this.program();
+    if (!prog.length) return null;
+    const codes = prog.map((p) => p.code as SeanceCode);
+    if (!derniere) return codes[0];
+    const idx = codes.indexOf(derniere);
+    return codes[(idx + 1) % codes.length];
   });
 
   readonly dernieresSessions = computed(() => this.storage.sessions().slice(0, 3));
 
   constructor(private storage: StorageService, private router: Router) {}
 
-  demarrer(code: SeanceCode): void {
+  demarrer(code: string): void {
     this.router.navigate(['/seance', code]);
   }
 

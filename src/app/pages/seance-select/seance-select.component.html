@@ -3,7 +3,7 @@
 
 <div class="seance-grid">
   <button
-    *ngFor="let s of program"
+    *ngFor="let s of program()"
     type="button"
     class="seance-card"
     [class.suggested]="s.code === suggestion()"

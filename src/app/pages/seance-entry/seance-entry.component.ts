@@ -3,7 +3,6 @@ import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { StorageService } from '../../services/storage.service';
-import { PROGRAM } from '../../data/program';
 import { Difficulte, DIFFICULTE_LABELS, ExerciseLog, ExerciseType, SeanceCode, SessionLog } from '../../models/fitness.model';
 
 interface ExerciseFormRow {
@@ -43,8 +42,9 @@ export class SeanceEntryComponent implements OnInit {
 
   ngOnInit(): void {
     const code = this.route.snapshot.paramMap.get('code') as SeanceCode;
-    const seance = PROGRAM.find((p) => p.code === code) ?? PROGRAM[0];
-    this.code = seance.code;
+    const seance = this.storage.program().find((p) => p.code === code) ?? this.storage.program()[0];
+    if (!seance) return;
+    this.code = seance.code as SeanceCode;
     this.label = seance.label;
 
     this.rows = seance.exercices.map((ex) => {

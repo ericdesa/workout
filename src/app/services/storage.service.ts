@@ -1,11 +1,13 @@
 import { Injectable, signal } from '@angular/core';
-import { SessionLog } from '../models/fitness.model';
+import { ProgramSeance, SessionLog } from '../models/fitness.model';
+import { PROGRAM } from '../data/program';
 import { SupabaseService } from './supabase.service';
 import { AuthService } from './auth.service';
 
 @Injectable({ providedIn: 'root' })
 export class StorageService {
   readonly sessions = signal<SessionLog[]>([]);
+  readonly program = signal<ProgramSeance[]>(PROGRAM);
 
   constructor(private supabase: SupabaseService, private auth: AuthService) {}
 
@@ -31,6 +33,34 @@ export class StorageService {
         notes: row.notes
       }))
     );
+  }
+
+  async loadProgram(): Promise<void> {
+    const { data, error } = await this.supabase.client
+      .from('user_program')
+      .select('program')
+      .eq('user_id', this.uid())
+      .maybeSingle();
+    if (error) throw error;
+    if (data?.program) {
+      this.program.set(data.program as ProgramSeance[]);
+    } else {
+      this.program.set(PROGRAM);
+    }
+  }
+
+  async saveProgram(seances: ProgramSeance[]): Promise<void> {
+    const { error } = await this.supabase.client.from('user_program').upsert(
+      { user_id: this.uid(), program: seances },
+      { onConflict: 'user_id' }
+    );
+    if (error) throw error;
+    this.program.set(seances);
+  }
+
+  async resetProgram(): Promise<void> {
+    await this.supabase.client.from('user_program').delete().eq('user_id', this.uid());
+    this.program.set(PROGRAM);
   }
 
   async saveSession(session: SessionLog): Promise<void> {

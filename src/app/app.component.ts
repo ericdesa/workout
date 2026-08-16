@@ -17,17 +17,19 @@ export class AppComponent {
   constructor(public auth: AuthService, private storage: StorageService) {
     this.auth['supabase'].client.auth.onAuthStateChange(async (_event, session) => {
       if (session?.user) {
-        await this.storage.loadSessions();
+        await Promise.all([this.storage.loadSessions(), this.storage.loadProgram()]);
       }
     });
 
     if (this.auth.isLoggedIn()) {
       this.storage.loadSessions();
+      this.storage.loadProgram();
     }
   }
 
   async logout(): Promise<void> {
     await this.auth.signOut();
     this.storage.sessions.set([]);
+    this.storage.program.set([]);
   }
 }
