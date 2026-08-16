@@ -1,0 +1,30 @@
+<div class="shell">
+  <header class="topbar">
+    <span class="logo">🏋️ Ma salle</span>
+    <nav class="nav-desktop">
+      <a routerLink="/accueil" routerLinkActive="active">Séance</a>
+      <a routerLink="/historique" routerLinkActive="active">Historique</a>
+      <a routerLink="/programme" routerLinkActive="active">Programme</a>
+      <a routerLink="/reglages" routerLinkActive="active">Réglages</a>
+    </nav>
+  </header>
+
+  <main class="content">
+    <router-outlet />
+  </main>
+
+  <nav class="nav-mobile">
+    <a routerLink="/accueil" routerLinkActive="active">
+      <span class="icon">🏠</span><span>Séance</span>
+    </a>
+    <a routerLink="/historique" routerLinkActive="active">
+      <span class="icon">📅</span><span>Historique</span>
+    </a>
+    <a routerLink="/programme" routerLinkActive="active">
+      <span class="icon">📋</span><span>Programme</span>
+    </a>
+    <a routerLink="/reglages" routerLinkActive="active">
+      <span class="icon">⚙️</span><span>Réglages</span>
+    </a>
+  </nav>
+</div>

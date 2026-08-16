@@ -1,0 +1,61 @@
+<div *ngIf="notFound" class="card empty-state">Séance introuvable.</div>
+
+<ng-container *ngIf="session as s">
+  <div class="page-header">
+    <a routerLink="/historique" class="back">← Historique</a>
+    <h1>Séance {{ s.seanceCode }}</h1>
+    <p class="muted date-txt">{{ dateLongue(s.date) }}</p>
+    <input type="date" [(ngModel)]="s.date" class="date-input" />
+  </div>
+
+  <div class="card exercise-card" *ngFor="let ex of s.exercices">
+    <div class="exercise-head">
+      <h2>{{ ex.exerciceNom }}</h2>
+      <span class="pill" *ngIf="ex.difficulte" [class]="'pill-' + ex.difficulte">{{ difficulteLabels[ex.difficulte] }}</span>
+      <span class="pill pill-douleur" *ngIf="ex.douleur">Douleur</span>
+    </div>
+
+    <div class="sets-table">
+      <div class="sets-row sets-row-head">
+        <span>Série</span>
+        <span>Kg</span>
+        <span>Reps</span>
+        <span></span>
+      </div>
+      <div class="sets-row" *ngFor="let set of ex.sets; let si = index">
+        <span>{{ si + 1 }}</span>
+        <input type="number" step="0.5" min="0" [(ngModel)]="set.kg" />
+        <input type="number" min="0" [(ngModel)]="set.reps" />
+        <button type="button" class="icon-btn" (click)="retirerSerie(ex, si)">✕</button>
+      </div>
+    </div>
+    <button type="button" class="btn add-set" (click)="ajouterSerie(ex)">+ Série</button>
+
+    <div class="row-meta">
+      <select [(ngModel)]="ex.difficulte">
+        <option [ngValue]="null">Difficulté ?</option>
+        <option *ngFor="let d of difficulteOptions" [ngValue]="d.value">{{ d.label }}</option>
+      </select>
+      <label class="douleur-toggle">
+        <input type="checkbox" [(ngModel)]="ex.douleur" />
+        Douleur
+      </label>
+    </div>
+    <input type="text" class="comment-input" [(ngModel)]="ex.commentaire" placeholder="Commentaire" />
+  </div>
+
+  <div class="card">
+    <h3>Notes de séance</h3>
+    <textarea rows="3" [(ngModel)]="s.notes"></textarea>
+  </div>
+
+  <div class="actions">
+    <button type="button" class="btn btn-primary btn-block" (click)="enregistrer()">Enregistrer les modifications</button>
+    <button type="button" class="btn btn-danger btn-block" *ngIf="!confirmDelete" (click)="confirmDelete = true">Supprimer cette séance</button>
+    <div class="confirm-row" *ngIf="confirmDelete">
+      <span class="muted">Confirmer la suppression ?</span>
+      <button type="button" class="btn btn-danger" (click)="supprimer()">Oui, supprimer</button>
+      <button type="button" class="btn" (click)="confirmDelete = false">Annuler</button>
+    </div>
+  </div>
+</ng-container>

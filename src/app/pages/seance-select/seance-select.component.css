@@ -1,0 +1,63 @@
+.seance-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.seance-card {
+  position: relative;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  color: var(--text);
+}
+
+.seance-card .code {
+  font-size: 26px;
+  font-weight: 800;
+}
+
+.seance-card .label {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.seance-card .count {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.seance-card.suggested {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 1px var(--accent) inset;
+}
+
+.badge {
+  position: absolute;
+  top: -8px;
+  right: 8px;
+  background: var(--accent);
+  color: #06251b;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 999px;
+}
+
+.recent-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 0;
+  border-top: 1px solid var(--border);
+}
+
+.recent-row:first-of-type {
+  border-top: none;
+}

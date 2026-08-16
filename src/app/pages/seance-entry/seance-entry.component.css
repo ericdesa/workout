@@ -1,0 +1,117 @@
+.page-header {
+  margin-bottom: 16px;
+}
+
+.back {
+  text-decoration: none;
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+.exercise-card {
+  padding: 14px 16px;
+}
+
+.exercise-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.exercise-head h2 {
+  margin: 0;
+}
+
+.target {
+  font-size: 12px;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.last-time {
+  margin: 6px 0 2px;
+  font-size: 13px;
+  color: var(--accent);
+}
+
+.last-comment {
+  font-size: 12px;
+  font-style: italic;
+  margin-top: 0;
+}
+
+.sets-table {
+  margin-top: 10px;
+}
+
+.sets-row {
+  display: grid;
+  grid-template-columns: 28px 1fr 1fr 32px;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.sets-row-head {
+  font-size: 11px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+
+.sets-row input {
+  width: 100%;
+  padding: 8px 10px;
+}
+
+.icon-btn {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 14px;
+}
+
+.add-set {
+  font-size: 13px;
+  padding: 8px 12px;
+  margin-top: 4px;
+}
+
+.row-meta {
+  display: flex;
+  gap: 10px;
+  margin-top: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.row-meta select {
+  flex: 1;
+  min-width: 120px;
+}
+
+.douleur-toggle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--danger);
+}
+
+.comment-input {
+  width: 100%;
+  margin-top: 10px;
+}
+
+textarea {
+  width: 100%;
+  resize: vertical;
+}
+
+.save-btn {
+  margin-top: 8px;
+  font-size: 16px;
+  padding: 16px;
+}

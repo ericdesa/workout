@@ -1,0 +1,53 @@
+<div class="page-header">
+  <a routerLink="/accueil" class="back">← Séances</a>
+  <h1>{{ label }}</h1>
+  <p class="muted">{{ aujourdhui | date: 'EEEE d MMMM' : '' : 'fr-FR' }}</p>
+</div>
+
+<div class="card exercise-card" *ngFor="let row of rows; let ri = index">
+  <div class="exercise-head">
+    <h2>{{ row.exerciceNom }}</h2>
+    <span class="target">{{ row.seriesCible }} × {{ row.repsLabel }} · repos {{ row.reposLabel }}</span>
+  </div>
+  <p class="last-time">🕓 Dernière fois : {{ dernierResume(row) }}</p>
+  <p class="last-comment muted" *ngIf="row.dernier?.log?.commentaire">
+    « {{ row.dernier?.log?.commentaire }} »
+  </p>
+
+  <div class="sets-table">
+    <div class="sets-row sets-row-head">
+      <span>Série</span>
+      <span>Kg</span>
+      <span>Reps</span>
+      <span></span>
+    </div>
+    <div class="sets-row" *ngFor="let set of row.sets; let si = index">
+      <span>{{ si + 1 }}</span>
+      <input type="number" inputmode="decimal" step="0.5" min="0" [(ngModel)]="set.kg" placeholder="kg" />
+      <input type="number" inputmode="numeric" min="0" [(ngModel)]="set.reps" placeholder="reps" />
+      <button type="button" class="icon-btn" (click)="retirerSerie(row, si)" aria-label="Retirer la série">✕</button>
+    </div>
+  </div>
+  <button type="button" class="btn add-set" (click)="ajouterSerie(row)">+ Ajouter une série</button>
+
+  <div class="row-meta">
+    <select [(ngModel)]="row.difficulte">
+      <option [ngValue]="null">Difficulté ?</option>
+      <option *ngFor="let d of difficulteOptions" [ngValue]="d.value">{{ d.label }}</option>
+    </select>
+    <label class="douleur-toggle">
+      <input type="checkbox" [(ngModel)]="row.douleur" />
+      Douleur
+    </label>
+  </div>
+  <input type="text" class="comment-input" [(ngModel)]="row.commentaire" placeholder="Commentaire (optionnel)" />
+</div>
+
+<div class="card">
+  <h3>Notes de séance</h3>
+  <textarea rows="3" [(ngModel)]="notes" placeholder="Forme du jour, sensations générales..."></textarea>
+</div>
+
+<button type="button" class="btn btn-primary btn-block save-btn" (click)="enregistrer()">
+  ✓ Enregistrer la séance
+</button>

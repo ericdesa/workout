@@ -1,0 +1,24 @@
+<h1>Historique</h1>
+
+<div class="card">
+  <div class="year-switch">
+    <button type="button" class="icon-btn" (click)="changerAnnee(-1)">‹</button>
+    <strong>{{ year() }}</strong>
+    <button type="button" class="icon-btn" (click)="changerAnnee(1)">›</button>
+  </div>
+  <app-contribution-graph [activeDates]="activeDates()" [year]="year()" />
+  <p class="streak" *ngIf="streak() > 1">🔥 {{ streak() }} semaines de suite avec au moins une séance</p>
+</div>
+
+<div class="card" *ngIf="!sessions().length">
+  <p class="empty-state">Aucune séance enregistrée pour le moment.<br />Va dans « Séance » pour commencer.</p>
+</div>
+
+<div class="session-list" *ngIf="sessions().length">
+  <h3>Séances</h3>
+  <a class="session-item" *ngFor="let s of sessions()" [routerLink]="['/session', s.id]">
+    <span class="pill">{{ s.seanceCode }}</span>
+    <span class="date">{{ dateLongue(s.date) }}</span>
+    <span class="muted">{{ s.exercices.length }} exercices</span>
+  </a>
+</div>

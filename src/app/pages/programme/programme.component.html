@@ -1,0 +1,30 @@
+<h1>Programme débutant</h1>
+<p>Raffermissement / recomposition corporelle · 3 séances/semaine · 45–60 min · échauffement tapis 5–7 min à 5,5–6,5 km/h.</p>
+
+<div class="card" *ngFor="let s of program">
+  <h2>{{ s.label }}</h2>
+  <table class="prog-table">
+    <thead>
+      <tr><th>Exercice</th><th>Séries</th><th>Reps</th><th>Repos</th></tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let ex of s.exercices">
+        <td>{{ ex.nom }}</td>
+        <td>{{ ex.series }}</td>
+        <td>{{ ex.repsLabel }}</td>
+        <td>{{ ex.reposLabel }}</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="card">
+  <h3>Règles de progression</h3>
+  <dl class="regles">
+    <ng-container *ngFor="let r of regles">
+      <dt>{{ r.titre }}</dt>
+      <dd>{{ r.texte }}</dd>
+    </ng-container>
+  </dl>
+  <p class="muted">⚠️ Arm extension retiré pour l'instant (douleur épaule gauche).</p>
+</div>

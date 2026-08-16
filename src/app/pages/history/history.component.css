@@ -1,0 +1,45 @@
+.year-switch {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 12px;
+}
+
+.icon-btn {
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  color: var(--text);
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  font-size: 16px;
+}
+
+.streak {
+  margin: 10px 0 0;
+  font-size: 13px;
+  color: var(--warning);
+}
+
+.session-list {
+  margin-top: 6px;
+}
+
+.session-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  color: var(--text);
+  padding: 12px 4px;
+  border-top: 1px solid var(--border);
+}
+
+.session-item:first-of-type {
+  border-top: none;
+}
+
+.session-item .date {
+  text-transform: capitalize;
+  flex: 1;
+}

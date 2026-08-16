@@ -1,0 +1,35 @@
+.email-btn {
+  margin-top: 8px;
+}
+
+.import-mode {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 12px;
+  font-size: 14px;
+}
+
+.import-mode label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.file-btn {
+  display: block;
+  text-align: center;
+}
+
+.confirm-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.message {
+  text-align: center;
+  color: var(--accent);
+  font-size: 14px;
+}

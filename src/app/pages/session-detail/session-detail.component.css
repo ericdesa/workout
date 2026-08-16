@@ -1,0 +1,112 @@
+.page-header {
+  margin-bottom: 16px;
+}
+
+.back {
+  text-decoration: none;
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+.date-txt {
+  text-transform: capitalize;
+  margin-bottom: 4px;
+}
+
+.date-input {
+  font-size: 13px;
+  padding: 6px 8px;
+}
+
+.exercise-card {
+  padding: 14px 16px;
+}
+
+.exercise-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.exercise-head h2 {
+  margin: 0;
+  flex: 1;
+}
+
+.sets-table {
+  margin-top: 10px;
+}
+
+.sets-row {
+  display: grid;
+  grid-template-columns: 28px 1fr 1fr 32px;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.sets-row-head {
+  font-size: 11px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+
+.icon-btn {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 14px;
+}
+
+.add-set {
+  font-size: 13px;
+  padding: 8px 12px;
+  margin-top: 4px;
+}
+
+.row-meta {
+  display: flex;
+  gap: 10px;
+  margin-top: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.row-meta select {
+  flex: 1;
+  min-width: 120px;
+}
+
+.douleur-toggle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--danger);
+}
+
+.comment-input {
+  width: 100%;
+  margin-top: 10px;
+}
+
+textarea {
+  width: 100%;
+  resize: vertical;
+}
+
+.actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.confirm-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
