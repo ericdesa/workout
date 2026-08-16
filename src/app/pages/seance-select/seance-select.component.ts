@@ -8,7 +8,7 @@ import { SeanceCode } from '../../models/fitness.model';
   standalone: true,
   imports: [RouterLink],
   templateUrl: './seance-select.component.html',
-  styleUrl: './seance-select.component.css'
+  styleUrl: './seance-select.component.scss'
 })
 export class SeanceSelectComponent {
   readonly program = computed(() => this.storage.program());

@@ -8,7 +8,7 @@ import { AuthService } from '../../services/auth.service';
   standalone: true,
   imports: [FormsModule],
   templateUrl: './reglages.component.html',
-  styleUrl: './reglages.component.css'
+  styleUrl: './reglages.component.scss'
 })
 export class ReglagesComponent {
   readonly nbSessions = () => this.storage.sessions().length;

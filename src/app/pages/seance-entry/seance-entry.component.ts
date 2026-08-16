@@ -37,7 +37,7 @@ interface AddExercisePicker {
   standalone: true,
   imports: [DatePipe, FormsModule, RouterLink],
   templateUrl: './seance-entry.component.html',
-  styleUrl: './seance-entry.component.css'
+  styleUrl: './seance-entry.component.scss'
 })
 export class SeanceEntryComponent implements OnInit, OnDestroy {
   code: SeanceCode = 'A';

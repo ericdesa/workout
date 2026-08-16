@@ -21,7 +21,7 @@ const JOURS_COURT = ['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam'];
   standalone: true,
   imports: [],
   templateUrl: './contribution-graph.component.html',
-  styleUrl: './contribution-graph.component.css'
+  styleUrl: './contribution-graph.component.scss'
 })
 export class ContributionGraphComponent implements OnChanges {
   @Input() activeDates: Set<string> = new Set();

@@ -9,7 +9,7 @@ import { ProgramExercise, ProgramSeance, ExerciseType } from '../../models/fitne
   standalone: true,
   imports: [FormsModule],
   templateUrl: './programme.component.html',
-  styleUrl: './programme.component.css'
+  styleUrl: './programme.component.scss'
 })
 export class ProgrammeComponent {
   readonly regles = REGLES_PROGRESSION;

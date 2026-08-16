@@ -8,7 +8,7 @@ import { ContributionGraphComponent } from '../../components/contribution-graph/
   standalone: true,
   imports: [RouterLink, ContributionGraphComponent],
   templateUrl: './history.component.html',
-  styleUrl: './history.component.css'
+  styleUrl: './history.component.scss'
 })
 export class HistoryComponent {
   readonly year = signal(new Date().getFullYear());

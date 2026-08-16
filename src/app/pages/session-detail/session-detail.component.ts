@@ -9,7 +9,7 @@ import { DIFFICULTE_LABELS, Difficulte, ExerciseLog, ExerciseType, ProgramExerci
   standalone: true,
   imports: [FormsModule, RouterLink],
   templateUrl: './session-detail.component.html',
-  styleUrl: './session-detail.component.css'
+  styleUrl: './session-detail.component.scss'
 })
 export class SessionDetailComponent implements OnInit, OnDestroy {
   session: SessionLog | null = null;

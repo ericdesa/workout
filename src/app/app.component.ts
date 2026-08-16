@@ -8,7 +8,7 @@ import { StorageService } from './services/storage.service';
   standalone: true,
   imports: [RouterOutlet, RouterLink, RouterLinkActive],
   templateUrl: './app.component.html',
-  styleUrl: './app.component.css'
+  styleUrl: './app.component.scss'
 })
 export class AppComponent {
   readonly userEmail = computed(() => this.auth.user()?.email ?? null);
