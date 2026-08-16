@@ -17,7 +17,7 @@ export const PROGRAM: ProgramSeance[] = [
       { id: 'abductor', nom: 'Abductor', series: 3, repsLabel: '10–15', reposLabel: '60–90 s' },
       { id: 'prone-leg-curl', nom: 'Prone leg curl', series: 3, repsLabel: '10–12', reposLabel: '90 s' },
       { id: 'total-abdominal', nom: 'Total abdominal', series: 2, repsLabel: '10–15', reposLabel: '60 s' },
-      { id: 'tapis', nom: 'Tapis', series: 1, repsLabel: '5–10 min', reposLabel: '—' }
+      { id: 'tapis', nom: 'Tapis', type: 'cardio', series: 1, repsLabel: '5–10 min', reposLabel: '—' }
     ]
   },
   {
@@ -30,7 +30,7 @@ export const PROGRAM: ProgramSeance[] = [
       { id: 'abductor', nom: 'Abductor', series: 3, repsLabel: '10–15', reposLabel: '60–90 s' },
       { id: 'prone-leg-curl', nom: 'Prone leg curl', series: 3, repsLabel: '10–12', reposLabel: '90 s' },
       { id: 'total-abdominal', nom: 'Total abdominal', series: 2, repsLabel: '10–15', reposLabel: '60 s' },
-      { id: 'tapis', nom: 'Tapis', series: 1, repsLabel: '5–10 min', reposLabel: '—' }
+      { id: 'tapis', nom: 'Tapis', type: 'cardio', series: 1, repsLabel: '5–10 min', reposLabel: '—' }
     ]
   },
   {
@@ -43,7 +43,7 @@ export const PROGRAM: ProgramSeance[] = [
       { id: 'arm-curl', nom: 'Arm curl', series: 3, repsLabel: '10–12', reposLabel: '60–90 s' },
       { id: 'abductor', nom: 'Abductor', series: 3, repsLabel: '10–15', reposLabel: '60–90 s' },
       { id: 'total-abdominal', nom: 'Total abdominal', series: 2, repsLabel: '10–15', reposLabel: '60 s' },
-      { id: 'tapis', nom: 'Tapis', series: 1, repsLabel: '5–10 min', reposLabel: '—' }
+      { id: 'tapis', nom: 'Tapis', type: 'cardio', series: 1, repsLabel: '5–10 min', reposLabel: '—' }
     ]
   }
 ];

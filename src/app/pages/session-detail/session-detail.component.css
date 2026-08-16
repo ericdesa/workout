@@ -110,3 +110,38 @@ textarea {
   gap: 10px;
   flex-wrap: wrap;
 }
+
+.cardio-inputs {
+  display: flex;
+  gap: 16px;
+  margin-top: 10px;
+}
+
+.cardio-field {
+  flex: 1;
+}
+
+.cardio-field label {
+  display: block;
+  font-size: 11px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+
+.input-with-unit {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.input-with-unit input {
+  flex: 1;
+  min-width: 0;
+}
+
+.input-with-unit .unit {
+  font-size: 13px;
+  color: var(--text-muted);
+  white-space: nowrap;
+}

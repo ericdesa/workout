@@ -1,8 +1,11 @@
 export type SeanceCode = 'A' | 'B' | 'C';
 
+export type ExerciseType = 'musculation' | 'cardio';
+
 export interface ProgramExercise {
   id: string;
   nom: string;
+  type?: ExerciseType;
   series: number;
   repsLabel: string;
   reposLabel: string;
@@ -32,6 +35,8 @@ export interface ExerciseLog {
   exerciceId: string;
   exerciceNom: string;
   sets: SetEntry[];
+  distance?: number | null;
+  duration?: number | null;
   difficulte: Difficulte | null;
   douleur: boolean;
   commentaire: string;

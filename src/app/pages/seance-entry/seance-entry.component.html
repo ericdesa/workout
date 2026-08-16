@@ -14,21 +14,42 @@
     « {{ row.dernier?.log?.commentaire }} »
   </p>
 
-  <div class="sets-table">
-    <div class="sets-row sets-row-head">
-      <span>Série</span>
-      <span>Kg</span>
-      <span>Reps</span>
-      <span></span>
+  <ng-container *ngIf="row.type === 'musculation'; else cardioBlock">
+    <div class="sets-table">
+      <div class="sets-row sets-row-head">
+        <span>Série</span>
+        <span>Kg</span>
+        <span>Reps</span>
+        <span></span>
+      </div>
+      <div class="sets-row" *ngFor="let set of row.sets; let si = index">
+        <span>{{ si + 1 }}</span>
+        <input type="number" inputmode="decimal" step="0.5" min="0" [(ngModel)]="set.kg" placeholder="kg" />
+        <input type="number" inputmode="numeric" min="0" [(ngModel)]="set.reps" placeholder="reps" />
+        <button type="button" class="icon-btn" (click)="retirerSerie(row, si)" aria-label="Retirer la série">✕</button>
+      </div>
     </div>
-    <div class="sets-row" *ngFor="let set of row.sets; let si = index">
-      <span>{{ si + 1 }}</span>
-      <input type="number" inputmode="decimal" step="0.5" min="0" [(ngModel)]="set.kg" placeholder="kg" />
-      <input type="number" inputmode="numeric" min="0" [(ngModel)]="set.reps" placeholder="reps" />
-      <button type="button" class="icon-btn" (click)="retirerSerie(row, si)" aria-label="Retirer la série">✕</button>
+    <button type="button" class="btn add-set" (click)="ajouterSerie(row)">+ Ajouter une série</button>
+  </ng-container>
+
+  <ng-template #cardioBlock>
+    <div class="cardio-inputs">
+      <div class="cardio-field">
+        <label>Distance</label>
+        <div class="input-with-unit">
+          <input type="number" inputmode="decimal" step="0.1" min="0" [(ngModel)]="row.distance" placeholder="0.0" />
+          <span class="unit">km</span>
+        </div>
+      </div>
+      <div class="cardio-field">
+        <label>Durée</label>
+        <div class="input-with-unit">
+          <input type="number" inputmode="numeric" min="0" [(ngModel)]="row.duration" placeholder="0" />
+          <span class="unit">min</span>
+        </div>
+      </div>
     </div>
-  </div>
-  <button type="button" class="btn add-set" (click)="ajouterSerie(row)">+ Ajouter une série</button>
+  </ng-template>
 
   <div class="row-meta">
     <select [(ngModel)]="row.difficulte">

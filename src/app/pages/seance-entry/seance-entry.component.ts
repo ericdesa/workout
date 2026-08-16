@@ -4,16 +4,19 @@ import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { StorageService } from '../../services/storage.service';
 import { PROGRAM } from '../../data/program';
-import { Difficulte, DIFFICULTE_LABELS, ExerciseLog, SeanceCode, SessionLog } from '../../models/fitness.model';
+import { Difficulte, DIFFICULTE_LABELS, ExerciseLog, ExerciseType, SeanceCode, SessionLog } from '../../models/fitness.model';
 
 interface ExerciseFormRow {
   exerciceId: string;
   exerciceNom: string;
+  type: ExerciseType;
   repsLabel: string;
   seriesCible: number;
   reposLabel: string;
   dernier: { date: string; log: ExerciseLog } | null;
   sets: { kg: number | null; reps: number | null }[];
+  distance: number | null;
+  duration: number | null;
   difficulte: Difficulte | null;
   douleur: boolean;
   commentaire: string;
@@ -47,15 +50,21 @@ export class SeanceEntryComponent implements OnInit {
     this.rows = seance.exercices.map((ex) => {
       const dernier = this.storage.getLastExerciseLog(ex.id);
       const seriesCible = ex.series;
+      const type: ExerciseType = ex.type ?? 'musculation';
       const dernierKg = dernier?.log.sets.find((s) => s.kg !== null)?.kg ?? null;
       return {
         exerciceId: ex.id,
         exerciceNom: ex.nom,
+        type,
         repsLabel: ex.repsLabel,
         seriesCible,
         reposLabel: ex.reposLabel,
         dernier,
-        sets: Array.from({ length: seriesCible }, () => ({ kg: dernierKg, reps: null })),
+        sets: type === 'musculation'
+          ? Array.from({ length: seriesCible }, () => ({ kg: dernierKg, reps: null }))
+          : [],
+        distance: null,
+        duration: null,
         difficulte: null,
         douleur: false,
         commentaire: ''
@@ -65,9 +74,18 @@ export class SeanceEntryComponent implements OnInit {
 
   dernierResume(row: ExerciseFormRow): string {
     if (!row.dernier) return 'Pas encore fait';
+    const d = new Date(row.dernier.date).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short' });
+    if (row.type === 'cardio') {
+      const dist = row.dernier.log.distance;
+      const dur = row.dernier.log.duration;
+      const parts = [
+        dist != null ? `${dist} km` : null,
+        dur != null ? `${dur} min` : null
+      ].filter(Boolean);
+      return `${d} — ${parts.join(', ') || '—'}`;
+    }
     const sets = row.dernier.log.sets.filter((s) => s.kg !== null || s.reps !== null);
     const setsTxt = sets.map((s) => `${s.kg ?? '?'}kg×${s.reps ?? '?'}`).join(', ');
-    const d = new Date(row.dernier.date).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short' });
     return `${d} — ${setsTxt || '—'}`;
   }
 
@@ -84,7 +102,11 @@ export class SeanceEntryComponent implements OnInit {
     const exercices: ExerciseLog[] = this.rows.map((r) => ({
       exerciceId: r.exerciceId,
       exerciceNom: r.exerciceNom,
-      sets: r.sets.filter((s) => s.kg !== null || s.reps !== null),
+      sets: r.type === 'musculation'
+        ? r.sets.filter((s) => s.kg !== null || s.reps !== null)
+        : [],
+      distance: r.type === 'cardio' ? r.distance : undefined,
+      duration: r.type === 'cardio' ? r.duration : undefined,
       difficulte: r.difficulte,
       douleur: r.douleur,
       commentaire: r.commentaire.trim()

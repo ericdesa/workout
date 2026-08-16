@@ -3,7 +3,8 @@ import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { StorageService } from '../../services/storage.service';
-import { DIFFICULTE_LABELS, Difficulte, SessionLog } from '../../models/fitness.model';
+import { PROGRAM } from '../../data/program';
+import { DIFFICULTE_LABELS, Difficulte, ExerciseLog, SessionLog } from '../../models/fitness.model';
 
 @Component({
   selector: 'app-session-detail',
@@ -21,6 +22,10 @@ export class SessionDetailComponent implements OnInit {
     Object.keys(DIFFICULTE_LABELS) as Difficulte[]
   ).map((value) => ({ value, label: DIFFICULTE_LABELS[value] }));
 
+  private cardioIds = new Set(
+    PROGRAM.flatMap((s) => s.exercices).filter((e) => e.type === 'cardio').map((e) => e.id)
+  );
+
   constructor(private route: ActivatedRoute, private router: Router, private storage: StorageService) {}
 
   ngOnInit(): void {
@@ -31,6 +36,10 @@ export class SessionDetailComponent implements OnInit {
       return;
     }
     this.session = JSON.parse(JSON.stringify(found));
+  }
+
+  isCardio(ex: ExerciseLog): boolean {
+    return this.cardioIds.has(ex.exerciceId);
   }
 
   ajouterSerie(ex: SessionLog['exercices'][number]): void {
