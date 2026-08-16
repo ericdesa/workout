@@ -3,7 +3,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { StorageService } from '../../services/storage.service';
-import { DIFFICULTE_LABELS, Difficulte, ExerciseLog, SessionLog } from '../../models/fitness.model';
+import { DIFFICULTE_LABELS, Difficulte, ExerciseLog, ExerciseType, ProgramExercise, SessionLog } from '../../models/fitness.model';
 
 @Component({
   selector: 'app-session-detail',
@@ -16,6 +16,17 @@ export class SessionDetailComponent implements OnInit {
   session: SessionLog | null = null;
   notFound = false;
   confirmDelete = false;
+  showAddExercise = false;
+  addPicker = {
+    mode: 'program' as 'program' | 'custom',
+    programExerciseId: '',
+    customName: '',
+    customType: 'musculation' as ExerciseType,
+    customSeries: 3,
+    customRepsLabel: '10–12',
+    customReposLabel: '90 s'
+  };
+  private programExercices: ProgramExercise[] = [];
   readonly difficulteLabels = DIFFICULTE_LABELS;
   readonly difficulteOptions: { value: Difficulte; label: string }[] = (
     Object.keys(DIFFICULTE_LABELS) as Difficulte[]
@@ -31,9 +42,16 @@ export class SessionDetailComponent implements OnInit {
       return;
     }
     this.session = JSON.parse(JSON.stringify(found));
+
+    const seance = this.storage.program().find((p) => p.code === this.session!.seanceCode);
+    this.programExercices = seance?.exercices ?? [];
+    this.addPicker.programExerciseId = this.availableProgramExercises()[0]?.id ?? '';
   }
 
   isCardio(ex: ExerciseLog): boolean {
+    if (ex.exerciceId.startsWith('custom-')) {
+      return ex.distance != null || ex.duration != null;
+    }
     const allExercices = this.storage.program().flatMap((s) => s.exercices);
     const found = allExercices.find((e) => e.id === ex.exerciceId);
     return found?.type === 'cardio';
@@ -46,6 +64,53 @@ export class SessionDetailComponent implements OnInit {
 
   retirerSerie(ex: SessionLog['exercices'][number], i: number): void {
     ex.sets.splice(i, 1);
+  }
+
+  supprimerExercice(index: number): void {
+    this.session!.exercices.splice(index, 1);
+  }
+
+  availableProgramExercises(): ProgramExercise[] {
+    const usedIds = new Set(this.session!.exercices.map((e) => e.exerciceId));
+    return this.programExercices.filter((pe) => !usedIds.has(pe.id));
+  }
+
+  toggleAddExercise(): void {
+    this.showAddExercise = !this.showAddExercise;
+    if (this.showAddExercise) {
+      this.addPicker.programExerciseId = this.availableProgramExercises()[0]?.id ?? '';
+      this.addPicker.customName = '';
+    }
+  }
+
+  ajouterExercice(): void {
+    if (this.addPicker.mode === 'program') {
+      const pe = this.programExercices.find((e) => e.id === this.addPicker.programExerciseId);
+      if (!pe) return;
+      this.session!.exercices.push({
+        exerciceId: pe.id,
+        exerciceNom: pe.nom,
+        sets: pe.type !== 'cardio' ? Array.from({ length: pe.series }, () => ({ kg: null, reps: null })) : [],
+        difficulte: null,
+        douleur: false,
+        commentaire: ''
+      });
+    } else {
+      const name = this.addPicker.customName.trim();
+      if (!name) return;
+      const isCardio = this.addPicker.customType === 'cardio';
+      this.session!.exercices.push({
+        exerciceId: `custom-${Date.now()}`,
+        exerciceNom: name,
+        sets: isCardio ? [] : Array.from({ length: this.addPicker.customSeries }, () => ({ kg: null, reps: null })),
+        distance: isCardio ? null : undefined,
+        duration: isCardio ? null : undefined,
+        difficulte: null,
+        douleur: false,
+        commentaire: ''
+      });
+    }
+    this.showAddExercise = false;
   }
 
   async enregistrer(): Promise<void> {

@@ -8,11 +8,14 @@
     <input type="date" [(ngModel)]="s.date" class="date-input" />
   </div>
 
-  <div class="card exercise-card" *ngFor="let ex of s.exercices">
+  <div class="card exercise-card" *ngFor="let ex of s.exercices; let ri = index">
     <div class="exercise-head">
       <h2>{{ ex.exerciceNom }}</h2>
-      <span class="pill" *ngIf="ex.difficulte" [class]="'pill-' + ex.difficulte">{{ difficulteLabels[ex.difficulte] }}</span>
-      <span class="pill pill-douleur" *ngIf="ex.douleur">Douleur</span>
+      <div class="exercise-head-right">
+        <span class="pill" *ngIf="ex.difficulte" [class]="'pill-' + ex.difficulte">{{ difficulteLabels[ex.difficulte] }}</span>
+        <span class="pill pill-douleur" *ngIf="ex.douleur">Douleur</span>
+        <button type="button" class="icon-btn delete-exercise" (click)="supprimerExercice(ri)" aria-label="Supprimer l'exercice">✕</button>
+      </div>
     </div>
 
     <ng-container *ngIf="!isCardio(ex); else cardioBlock">
@@ -63,6 +66,45 @@
       </label>
     </div>
     <input type="text" class="comment-input" [(ngModel)]="ex.commentaire" placeholder="Commentaire" />
+  </div>
+
+  <div class="card add-exercise-card" *ngIf="!showAddExercise">
+    <button type="button" class="btn btn-block add-exercise-btn" (click)="toggleAddExercise()">+ Ajouter un exercice</button>
+  </div>
+
+  <div class="card add-exercise-form" *ngIf="showAddExercise">
+    <h3>Ajouter un exercice</h3>
+    <div class="add-mode-tabs">
+      <button type="button" class="tab" [class.active]="addPicker.mode === 'program'" (click)="addPicker.mode = 'program'">Exercice du programme</button>
+      <button type="button" class="tab" [class.active]="addPicker.mode === 'custom'" (click)="addPicker.mode = 'custom'">Exercice libre</button>
+    </div>
+
+    <div *ngIf="addPicker.mode === 'program'">
+      <select [(ngModel)]="addPicker.programExerciseId" *ngIf="availableProgramExercises().length > 0">
+        <option *ngFor="let pe of availableProgramExercises()" [ngValue]="pe.id">{{ pe.nom }}</option>
+      </select>
+      <p *ngIf="availableProgramExercises().length === 0" class="muted">Tous les exercices du programme sont déjà dans la séance.</p>
+    </div>
+
+    <div *ngIf="addPicker.mode === 'custom'" class="custom-exercise-fields">
+      <input type="text" [(ngModel)]="addPicker.customName" placeholder="Nom de l'exercice" />
+      <div class="custom-row">
+        <select [(ngModel)]="addPicker.customType">
+          <option value="musculation">Musculation</option>
+          <option value="cardio">Cardio</option>
+        </select>
+        <ng-container *ngIf="addPicker.customType === 'musculation'">
+          <input type="number" inputmode="numeric" min="1" [(ngModel)]="addPicker.customSeries" placeholder="Séries" />
+          <input type="text" [(ngModel)]="addPicker.customRepsLabel" placeholder="Reps" />
+          <input type="text" [(ngModel)]="addPicker.customReposLabel" placeholder="Repos" />
+        </ng-container>
+      </div>
+    </div>
+
+    <div class="add-exercise-actions">
+      <button type="button" class="btn btn-primary" (click)="ajouterExercice()" [disabled]="addPicker.mode === 'program' && !addPicker.programExerciseId">Ajouter</button>
+      <button type="button" class="btn" (click)="toggleAddExercise()">Annuler</button>
+    </div>
   </div>
 
   <div class="card">

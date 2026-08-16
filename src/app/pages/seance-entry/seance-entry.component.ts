@@ -19,6 +19,17 @@ interface ExerciseFormRow {
   difficulte: Difficulte | null;
   douleur: boolean;
   commentaire: string;
+  custom?: boolean;
+}
+
+interface AddExercisePicker {
+  mode: 'program' | 'custom';
+  programExerciseId: string;
+  customName: string;
+  customType: ExerciseType;
+  customSeries: number;
+  customRepsLabel: string;
+  customReposLabel: string;
 }
 
 @Component({
@@ -33,10 +44,22 @@ export class SeanceEntryComponent implements OnInit {
   label = '';
   rows: ExerciseFormRow[] = [];
   notes = '';
+  showAddExercise = false;
+  addPicker: AddExercisePicker = {
+    mode: 'program',
+    programExerciseId: '',
+    customName: '',
+    customType: 'musculation',
+    customSeries: 3,
+    customRepsLabel: '10–12',
+    customReposLabel: '90 s'
+  };
   readonly aujourdhui = new Date();
   readonly difficulteOptions: { value: Difficulte; label: string }[] = (
     Object.keys(DIFFICULTE_LABELS) as Difficulte[]
   ).map((value) => ({ value, label: DIFFICULTE_LABELS[value] }));
+
+  private programExercices: { id: string; nom: string; type: ExerciseType; series: number; repsLabel: string; reposLabel: string }[] = [];
 
   constructor(private route: ActivatedRoute, private router: Router, private storage: StorageService) {}
 
@@ -46,30 +69,18 @@ export class SeanceEntryComponent implements OnInit {
     if (!seance) return;
     this.code = seance.code as SeanceCode;
     this.label = seance.label;
+    this.programExercices = seance.exercices.map((ex) => ({
+      id: ex.id,
+      nom: ex.nom,
+      type: ex.type ?? 'musculation',
+      series: ex.series,
+      repsLabel: ex.repsLabel,
+      reposLabel: ex.reposLabel
+    }));
 
-    this.rows = seance.exercices.map((ex) => {
-      const dernier = this.storage.getLastExerciseLog(ex.id);
-      const seriesCible = ex.series;
-      const type: ExerciseType = ex.type ?? 'musculation';
-      const dernierKg = dernier?.log.sets.find((s) => s.kg !== null)?.kg ?? null;
-      return {
-        exerciceId: ex.id,
-        exerciceNom: ex.nom,
-        type,
-        repsLabel: ex.repsLabel,
-        seriesCible,
-        reposLabel: ex.reposLabel,
-        dernier,
-        sets: type === 'musculation'
-          ? Array.from({ length: seriesCible }, () => ({ kg: dernierKg, reps: null }))
-          : [],
-        distance: null,
-        duration: null,
-        difficulte: null,
-        douleur: false,
-        commentaire: ''
-      };
-    });
+    this.rows = seance.exercices.map((ex) => this.buildRow(ex));
+
+    this.addPicker.programExerciseId = this.availableProgramExercises()[0]?.id ?? '';
   }
 
   dernierResume(row: ExerciseFormRow): string {
@@ -87,6 +98,67 @@ export class SeanceEntryComponent implements OnInit {
     const sets = row.dernier.log.sets.filter((s) => s.kg !== null || s.reps !== null);
     const setsTxt = sets.map((s) => `${s.kg ?? '?'}kg×${s.reps ?? '?'}`).join(', ');
     return `${d} — ${setsTxt || '—'}`;
+  }
+
+  availableProgramExercises() {
+    const usedIds = new Set(this.rows.map((r) => r.exerciceId));
+    return this.programExercices.filter((pe) => !usedIds.has(pe.id));
+  }
+
+  toggleAddExercise(): void {
+    this.showAddExercise = !this.showAddExercise;
+    if (this.showAddExercise) {
+      this.addPicker.programExerciseId = this.availableProgramExercises()[0]?.id ?? '';
+      this.addPicker.customName = '';
+    }
+  }
+
+  ajouterExercice(): void {
+    if (this.addPicker.mode === 'program') {
+      const pe = this.programExercices.find((e) => e.id === this.addPicker.programExerciseId);
+      if (!pe) return;
+      this.rows.push(this.buildRow(pe));
+    } else {
+      const name = this.addPicker.customName.trim();
+      if (!name) return;
+      this.rows.push(this.buildRow({
+        id: `custom-${Date.now()}`,
+        nom: name,
+        type: this.addPicker.customType,
+        series: this.addPicker.customType === 'cardio' ? 1 : this.addPicker.customSeries,
+        repsLabel: this.addPicker.customType === 'cardio' ? '5–10 min' : this.addPicker.customRepsLabel,
+        reposLabel: this.addPicker.customType === 'cardio' ? '—' : this.addPicker.customReposLabel
+      }));
+    }
+    this.showAddExercise = false;
+  }
+
+  supprimerExercice(index: number): void {
+    this.rows.splice(index, 1);
+  }
+
+  private buildRow(ex: { id: string; nom: string; type?: ExerciseType; series: number; repsLabel: string; reposLabel: string }): ExerciseFormRow {
+    const type: ExerciseType = ex.type ?? 'musculation';
+    const dernier = this.storage.getLastExerciseLog(ex.id);
+    const dernierKg = dernier?.log.sets.find((s) => s.kg !== null)?.kg ?? null;
+    return {
+      exerciceId: ex.id,
+      exerciceNom: ex.nom,
+      type,
+      repsLabel: ex.repsLabel,
+      seriesCible: ex.series,
+      reposLabel: ex.reposLabel,
+      dernier,
+      sets: type === 'musculation'
+        ? Array.from({ length: ex.series }, () => ({ kg: dernierKg, reps: null }))
+        : [],
+      distance: null,
+      duration: null,
+      difficulte: null,
+      douleur: false,
+      commentaire: '',
+      custom: ex.id.startsWith('custom-')
+    };
   }
 
   ajouterSerie(row: ExerciseFormRow): void {
