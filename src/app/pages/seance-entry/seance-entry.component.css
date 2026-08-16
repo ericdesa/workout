@@ -8,6 +8,24 @@
   font-size: 13px;
 }
 
+.save-status {
+  margin-top: 6px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.status-saving {
+  color: var(--text-muted);
+}
+
+.status-saved {
+  color: var(--accent);
+}
+
+.status-error {
+  color: var(--danger);
+}
+
 .exercise-card {
   padding: 14px 16px;
 }

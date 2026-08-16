@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { StorageService } from '../../services/storage.service';
@@ -12,11 +12,14 @@ import { DIFFICULTE_LABELS, Difficulte, ExerciseLog, ExerciseType, ProgramExerci
   templateUrl: './session-detail.component.html',
   styleUrl: './session-detail.component.css'
 })
-export class SessionDetailComponent implements OnInit {
+export class SessionDetailComponent implements OnInit, OnDestroy {
   session: SessionLog | null = null;
   notFound = false;
   confirmDelete = false;
   showAddExercise = false;
+  saveStatus: 'idle' | 'saving' | 'saved' | 'error' = 'idle';
+  saveError = '';
+  hasChanges = false;
   addPicker = {
     mode: 'program' as 'program' | 'custom',
     programExerciseId: '',
@@ -27,6 +30,7 @@ export class SessionDetailComponent implements OnInit {
     customReposLabel: '90 s'
   };
   private programExercices: ProgramExercise[] = [];
+  private autoSaveTimer: ReturnType<typeof setTimeout> | null = null;
   readonly difficulteLabels = DIFFICULTE_LABELS;
   readonly difficulteOptions: { value: Difficulte; label: string }[] = (
     Object.keys(DIFFICULTE_LABELS) as Difficulte[]
@@ -46,6 +50,30 @@ export class SessionDetailComponent implements OnInit {
     const seance = this.storage.program().find((p) => p.code === this.session!.seanceCode);
     this.programExercices = seance?.exercices ?? [];
     this.addPicker.programExerciseId = this.availableProgramExercises()[0]?.id ?? '';
+  }
+
+  ngOnDestroy(): void {
+    if (this.autoSaveTimer) clearTimeout(this.autoSaveTimer);
+  }
+
+  scheduleAutoSave(): void {
+    this.hasChanges = true;
+    this.saveStatus = 'idle';
+    if (this.autoSaveTimer) clearTimeout(this.autoSaveTimer);
+    this.autoSaveTimer = setTimeout(() => this.performAutoSave(), 2000);
+  }
+
+  private async performAutoSave(): Promise<void> {
+    if (!this.session) return;
+    this.saveStatus = 'saving';
+    try {
+      await this.storage.saveSession(this.session);
+      this.saveStatus = 'saved';
+      this.hasChanges = false;
+    } catch (e: any) {
+      this.saveStatus = 'error';
+      this.saveError = e?.message ?? 'Erreur réseau';
+    }
   }
 
   isCardio(ex: ExerciseLog): boolean {
@@ -115,8 +143,17 @@ export class SessionDetailComponent implements OnInit {
 
   async enregistrer(): Promise<void> {
     if (!this.session) return;
-    await this.storage.saveSession(this.session);
-    this.router.navigate(['/historique']);
+    if (this.autoSaveTimer) clearTimeout(this.autoSaveTimer);
+    this.saveStatus = 'saving';
+    try {
+      await this.storage.saveSession(this.session);
+      this.saveStatus = 'saved';
+      this.hasChanges = false;
+      this.router.navigate(['/historique']);
+    } catch (e: any) {
+      this.saveStatus = 'error';
+      this.saveError = e?.message ?? 'Erreur réseau';
+    }
   }
 
   async supprimer(): Promise<void> {

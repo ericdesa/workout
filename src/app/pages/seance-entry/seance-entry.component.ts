@@ -1,5 +1,5 @@
-import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { CommonModule, DatePipe } from '@angular/common';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { StorageService } from '../../services/storage.service';
@@ -39,7 +39,7 @@ interface AddExercisePicker {
   templateUrl: './seance-entry.component.html',
   styleUrl: './seance-entry.component.css'
 })
-export class SeanceEntryComponent implements OnInit {
+export class SeanceEntryComponent implements OnInit, OnDestroy {
   code: SeanceCode = 'A';
   label = '';
   rows: ExerciseFormRow[] = [];
@@ -54,6 +54,10 @@ export class SeanceEntryComponent implements OnInit {
     customRepsLabel: '10–12',
     customReposLabel: '90 s'
   };
+  saveStatus: 'idle' | 'saving' | 'saved' | 'error' = 'idle';
+  saveError = '';
+  private sessionId = crypto.randomUUID();
+  private autoSaveTimer: ReturnType<typeof setTimeout> | null = null;
   readonly aujourdhui = new Date();
   readonly difficulteOptions: { value: Difficulte; label: string }[] = (
     Object.keys(DIFFICULTE_LABELS) as Difficulte[]
@@ -81,6 +85,52 @@ export class SeanceEntryComponent implements OnInit {
     this.rows = seance.exercices.map((ex) => this.buildRow(ex));
 
     this.addPicker.programExerciseId = this.availableProgramExercises()[0]?.id ?? '';
+  }
+
+  ngOnDestroy(): void {
+    if (this.autoSaveTimer) clearTimeout(this.autoSaveTimer);
+  }
+
+  scheduleAutoSave(): void {
+    this.saveStatus = 'idle';
+    if (this.autoSaveTimer) clearTimeout(this.autoSaveTimer);
+    this.autoSaveTimer = setTimeout(() => this.performAutoSave(), 2000);
+  }
+
+  private async performAutoSave(): Promise<void> {
+    this.saveStatus = 'saving';
+    try {
+      await this.saveToSupabase();
+      this.saveStatus = 'saved';
+    } catch (e: any) {
+      this.saveStatus = 'error';
+      this.saveError = e?.message ?? 'Erreur réseau';
+    }
+  }
+
+  private async saveToSupabase(): Promise<void> {
+    const exercices: ExerciseLog[] = this.rows.map((r) => ({
+      exerciceId: r.exerciceId,
+      exerciceNom: r.exerciceNom,
+      sets: r.type === 'musculation'
+        ? r.sets.filter((s) => s.kg !== null || s.reps !== null)
+        : [],
+      distance: r.type === 'cardio' ? r.distance : undefined,
+      duration: r.type === 'cardio' ? r.duration : undefined,
+      difficulte: r.difficulte,
+      douleur: r.douleur,
+      commentaire: r.commentaire.trim()
+    }));
+
+    const session: SessionLog = {
+      id: this.sessionId,
+      date: this.todayIso(),
+      seanceCode: this.code,
+      exercices,
+      notes: this.notes.trim()
+    };
+
+    await this.storage.saveSession(session);
   }
 
   dernierResume(row: ExerciseFormRow): string {
@@ -176,28 +226,15 @@ export class SeanceEntryComponent implements OnInit {
   }
 
   async enregistrer(): Promise<void> {
-    const exercices: ExerciseLog[] = this.rows.map((r) => ({
-      exerciceId: r.exerciceId,
-      exerciceNom: r.exerciceNom,
-      sets: r.type === 'musculation'
-        ? r.sets.filter((s) => s.kg !== null || s.reps !== null)
-        : [],
-      distance: r.type === 'cardio' ? r.distance : undefined,
-      duration: r.type === 'cardio' ? r.duration : undefined,
-      difficulte: r.difficulte,
-      douleur: r.douleur,
-      commentaire: r.commentaire.trim()
-    }));
-
-    const session: SessionLog = {
-      id: crypto.randomUUID(),
-      date: this.todayIso(),
-      seanceCode: this.code,
-      exercices,
-      notes: this.notes.trim()
-    };
-
-    await this.storage.saveSession(session);
-    this.router.navigate(['/session', session.id]);
+    if (this.autoSaveTimer) clearTimeout(this.autoSaveTimer);
+    this.saveStatus = 'saving';
+    try {
+      await this.saveToSupabase();
+      this.saveStatus = 'saved';
+      this.router.navigate(['/session', this.sessionId]);
+    } catch (e: any) {
+      this.saveStatus = 'error';
+      this.saveError = e?.message ?? 'Erreur réseau';
+    }
   }
 }

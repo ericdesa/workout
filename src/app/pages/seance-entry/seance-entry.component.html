@@ -2,6 +2,11 @@
   <a routerLink="/accueil" class="back">← Séances</a>
   <h1>{{ label }}</h1>
   <p class="muted">{{ aujourdhui | date: 'EEEE d MMMM' : '' : 'fr-FR' }}</p>
+  <div class="save-status" *ngIf="saveStatus !== 'idle'">
+    <span *ngIf="saveStatus === 'saving'" class="status-saving">⏳ Sauvegarde…</span>
+    <span *ngIf="saveStatus === 'saved'" class="status-saved">✓ Sauvegardé</span>
+    <span *ngIf="saveStatus === 'error'" class="status-error">✕ Échec de la sauvegarde — {{ saveError }}</span>
+  </div>
 </div>
 
 <div class="card exercise-card" *ngFor="let row of rows; let ri = index">
@@ -27,8 +32,8 @@
       </div>
       <div class="sets-row" *ngFor="let set of row.sets; let si = index">
         <span>{{ si + 1 }}</span>
-        <input type="number" inputmode="decimal" step="0.5" min="0" [(ngModel)]="set.kg" placeholder="kg" />
-        <input type="number" inputmode="numeric" min="0" [(ngModel)]="set.reps" placeholder="reps" />
+        <input type="number" inputmode="decimal" step="0.5" min="0" [(ngModel)]="set.kg" (ngModelChange)="scheduleAutoSave()" placeholder="kg" />
+        <input type="number" inputmode="numeric" min="0" [(ngModel)]="set.reps" (ngModelChange)="scheduleAutoSave()" placeholder="reps" />
         <button type="button" class="icon-btn" (click)="retirerSerie(row, si)" aria-label="Retirer la série">✕</button>
       </div>
     </div>
@@ -40,14 +45,14 @@
       <div class="cardio-field">
         <label>Distance</label>
         <div class="input-with-unit">
-          <input type="number" inputmode="decimal" step="0.1" min="0" [(ngModel)]="row.distance" placeholder="0.0" />
+          <input type="number" inputmode="decimal" step="0.1" min="0" [(ngModel)]="row.distance" (ngModelChange)="scheduleAutoSave()" placeholder="0.0" />
           <span class="unit">km</span>
         </div>
       </div>
       <div class="cardio-field">
         <label>Durée</label>
         <div class="input-with-unit">
-          <input type="number" inputmode="numeric" min="0" [(ngModel)]="row.duration" placeholder="0" />
+          <input type="number" inputmode="numeric" min="0" [(ngModel)]="row.duration" (ngModelChange)="scheduleAutoSave()" placeholder="0" />
           <span class="unit">min</span>
         </div>
       </div>
@@ -55,16 +60,16 @@
   </ng-template>
 
   <div class="row-meta">
-    <select [(ngModel)]="row.difficulte">
+    <select [(ngModel)]="row.difficulte" (ngModelChange)="scheduleAutoSave()">
       <option [ngValue]="null">Difficulté ?</option>
       <option *ngFor="let d of difficulteOptions" [ngValue]="d.value">{{ d.label }}</option>
     </select>
     <label class="douleur-toggle">
-      <input type="checkbox" [(ngModel)]="row.douleur" />
+      <input type="checkbox" [(ngModel)]="row.douleur" (ngModelChange)="scheduleAutoSave()" />
       Douleur
     </label>
   </div>
-  <input type="text" class="comment-input" [(ngModel)]="row.commentaire" placeholder="Commentaire (optionnel)" />
+  <input type="text" class="comment-input" [(ngModel)]="row.commentaire" (ngModelChange)="scheduleAutoSave()" placeholder="Commentaire (optionnel)" />
 </div>
 
 <div class="card add-exercise-card" *ngIf="!showAddExercise">
@@ -108,7 +113,7 @@
 
 <div class="card">
   <h3>Notes de séance</h3>
-  <textarea rows="3" [(ngModel)]="notes" placeholder="Forme du jour, sensations générales..."></textarea>
+  <textarea rows="3" [(ngModel)]="notes" (ngModelChange)="scheduleAutoSave()" placeholder="Forme du jour, sensations générales..."></textarea>
 </div>
 
 <button type="button" class="btn btn-primary btn-block save-btn" (click)="enregistrer()">

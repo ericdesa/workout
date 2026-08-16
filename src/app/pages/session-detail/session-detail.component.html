@@ -5,14 +5,19 @@
     <a routerLink="/historique" class="back">← Historique</a>
     <h1>Séance {{ s.seanceCode }}</h1>
     <p class="muted date-txt">{{ dateLongue(s.date) }}</p>
-    <input type="date" [(ngModel)]="s.date" class="date-input" />
+    <input type="date" [(ngModel)]="s.date" (ngModelChange)="scheduleAutoSave()" class="date-input" />
+    <div class="save-status" *ngIf="saveStatus !== 'idle'">
+      <span *ngIf="saveStatus === 'saving'" class="status-saving">⏳ Sauvegarde…</span>
+      <span *ngIf="saveStatus === 'saved'" class="status-saved">✓ Sauvegardé</span>
+      <span *ngIf="saveStatus === 'error'" class="status-error">✕ Échec — {{ saveError }}</span>
+    </div>
   </div>
 
   <div class="card exercise-card" *ngFor="let ex of s.exercices; let ri = index">
     <div class="exercise-head">
       <h2>{{ ex.exerciceNom }}</h2>
       <div class="exercise-head-right">
-        <span class="pill" *ngIf="ex.difficulte" [class]="'pill-' + ex.difficulte">{{ difficulteLabels[ex.difficulte] }}</span>
+        <span class="pill" *ngIf="ex.difficulte" [class]="'pill-' + ex.difficulte">{{ difficulteLabels[ex.difficulte!] }}</span>
         <span class="pill pill-douleur" *ngIf="ex.douleur">Douleur</span>
         <button type="button" class="icon-btn delete-exercise" (click)="supprimerExercice(ri)" aria-label="Supprimer l'exercice">✕</button>
       </div>
@@ -28,8 +33,8 @@
         </div>
         <div class="sets-row" *ngFor="let set of ex.sets; let si = index">
           <span>{{ si + 1 }}</span>
-          <input type="number" step="0.5" min="0" [(ngModel)]="set.kg" />
-          <input type="number" min="0" [(ngModel)]="set.reps" />
+          <input type="number" step="0.5" min="0" [(ngModel)]="set.kg" (ngModelChange)="scheduleAutoSave()" />
+          <input type="number" min="0" [(ngModel)]="set.reps" (ngModelChange)="scheduleAutoSave()" />
           <button type="button" class="icon-btn" (click)="retirerSerie(ex, si)">✕</button>
         </div>
       </div>
@@ -41,14 +46,14 @@
         <div class="cardio-field">
           <label>Distance</label>
           <div class="input-with-unit">
-            <input type="number" inputmode="decimal" step="0.1" min="0" [(ngModel)]="ex.distance" placeholder="0.0" />
+            <input type="number" inputmode="decimal" step="0.1" min="0" [(ngModel)]="ex.distance" (ngModelChange)="scheduleAutoSave()" placeholder="0.0" />
             <span class="unit">km</span>
           </div>
         </div>
         <div class="cardio-field">
           <label>Durée</label>
           <div class="input-with-unit">
-            <input type="number" inputmode="numeric" min="0" [(ngModel)]="ex.duration" placeholder="0" />
+            <input type="number" inputmode="numeric" min="0" [(ngModel)]="ex.duration" (ngModelChange)="scheduleAutoSave()" placeholder="0" />
             <span class="unit">min</span>
           </div>
         </div>
@@ -56,16 +61,16 @@
     </ng-template>
 
     <div class="row-meta">
-      <select [(ngModel)]="ex.difficulte">
+      <select [(ngModel)]="ex.difficulte" (ngModelChange)="scheduleAutoSave()">
         <option [ngValue]="null">Difficulté ?</option>
         <option *ngFor="let d of difficulteOptions" [ngValue]="d.value">{{ d.label }}</option>
       </select>
       <label class="douleur-toggle">
-        <input type="checkbox" [(ngModel)]="ex.douleur" />
+        <input type="checkbox" [(ngModel)]="ex.douleur" (ngModelChange)="scheduleAutoSave()" />
         Douleur
       </label>
     </div>
-    <input type="text" class="comment-input" [(ngModel)]="ex.commentaire" placeholder="Commentaire" />
+    <input type="text" class="comment-input" [(ngModel)]="ex.commentaire" (ngModelChange)="scheduleAutoSave()" placeholder="Commentaire" />
   </div>
 
   <div class="card add-exercise-card" *ngIf="!showAddExercise">
@@ -109,11 +114,11 @@
 
   <div class="card">
     <h3>Notes de séance</h3>
-    <textarea rows="3" [(ngModel)]="s.notes"></textarea>
+    <textarea rows="3" [(ngModel)]="s.notes" (ngModelChange)="scheduleAutoSave()"></textarea>
   </div>
 
   <div class="actions">
-    <button type="button" class="btn btn-primary btn-block" (click)="enregistrer()">Enregistrer les modifications</button>
+    <button type="button" class="btn btn-primary btn-block" [disabled]="!hasChanges" (click)="enregistrer()">Enregistrer les modifications</button>
     <button type="button" class="btn btn-danger btn-block" *ngIf="!confirmDelete" (click)="confirmDelete = true">Supprimer cette séance</button>
     <div class="confirm-row" *ngIf="confirmDelete">
       <span class="muted">Confirmer la suppression ?</span>
