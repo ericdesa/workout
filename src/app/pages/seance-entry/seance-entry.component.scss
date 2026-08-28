@@ -47,22 +47,37 @@
   margin: 0;
 }
 
-.target {
-  font-size: 12px;
-  color: var(--text-muted);
-  white-space: nowrap;
-}
-
 .last-time {
   margin: 6px 0 2px;
   font-size: 13px;
   color: var(--accent);
 }
 
-.last-comment {
+.position-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 8px 0 0;
+}
+
+.position-row label {
   font-size: 12px;
-  font-style: italic;
-  margin-top: 0;
+  color: var(--text-muted);
+}
+
+.position-row input {
+  width: 70px;
+  padding: 6px 8px;
+}
+
+.ago-pill {
+  display: inline-block;
+  margin-left: 6px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--surface-2);
+  color: var(--text-muted);
+  font-size: 11px;
 }
 
 .sets-table {
@@ -115,14 +130,6 @@
   min-width: 120px;
 }
 
-.douleur-toggle {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 13px;
-  color: var(--danger);
-}
-
 .comment-input {
   width: 100%;
   margin-top: 10px;
@@ -165,7 +172,7 @@ textarea {
 
 .input-with-unit input {
   flex: 1;
-  min-width: 0;
+  min-width: 48px;
 }
 
 .exercise-head-actions {
@@ -189,83 +196,20 @@ textarea {
   padding: 12px 16px;
 }
 
-.add-exercise-btn {
-  font-size: 14px;
-  padding: 12px;
+.add-exercise-card h3 {
+  margin: 0 0 10px;
 }
 
-.add-exercise-form {
-  padding: 16px;
-}
-
-.add-exercise-form h3 {
-  margin-bottom: 12px;
-}
-
-.add-mode-tabs {
-  display: flex;
-  gap: 6px;
-  margin-bottom: 12px;
-}
-
-.tab {
-  flex: 1;
-  padding: 8px 12px;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  background: transparent;
-  color: var(--text-muted);
-  font-size: 13px;
-  font-weight: 600;
-  cursor: pointer;
-}
-
-.tab.active {
-  background: var(--surface-2);
-  color: var(--text);
-  border-color: var(--accent);
-}
-
-.add-exercise-form select {
+.add-exercise-card select {
   width: 100%;
-  margin-bottom: 10px;
-}
-
-.custom-exercise-fields input,
-.custom-exercise-fields select {
-  width: 100%;
-  margin-bottom: 8px;
-}
-
-.custom-row {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-}
-
-.custom-row select {
-  flex: 0 0 130px;
-  margin-bottom: 0;
-}
-
-.custom-row input {
-  flex: 1;
-  min-width: 60px;
-  margin-bottom: 0;
-}
-
-.add-exercise-actions {
-  display: flex;
-  gap: 8px;
-  margin-top: 12px;
-}
-
-.add-exercise-actions .btn {
-  flex: 1;
-}
-
-.input-with-unit .unit {
   font-size: 13px;
+}
+
+.empty-card {
+  text-align: center;
+}
+
+.empty-state {
   color: var(--text-muted);
-  white-space: nowrap;
+  text-align: center;
 }

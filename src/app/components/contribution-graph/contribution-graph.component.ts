@@ -25,15 +25,26 @@ const JOURS_COURT = ['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam'];
 })
 export class ContributionGraphComponent implements OnChanges {
   @Input() activeDates: Set<string> = new Set();
-  @Input() year: number = new Date().getFullYear();
 
   days: DayCell[] = [];
   monthLabels: MonthLabel[] = [];
   totalCols = 0;
   readonly jours = JOURS_COURT;
   total = 0;
+  intervalLabel = '';
+
+  private endMonth = new Date();
+  private today: Date = new Date();
 
   ngOnChanges(): void {
+    this.today = new Date();
+    this.today.setHours(0, 0, 0, 0);
+    this.endMonth = new Date(this.today.getFullYear(), this.today.getMonth(), 1);
+    this.build();
+  }
+
+  naviguer(delta: number): void {
+    this.endMonth.setMonth(this.endMonth.getMonth() + delta);
     this.build();
   }
 
@@ -45,11 +56,12 @@ export class ContributionGraphComponent implements OnChanges {
   }
 
   private build(): void {
-    const jan1 = new Date(this.year, 0, 1);
-    const paddingDays = jan1.getDay(); // 0 = dimanche
-    const dec31 = new Date(this.year, 11, 31);
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
+    const start = new Date(this.endMonth);
+    start.setMonth(start.getMonth() - 5);
+    start.setDate(1);
+
+    const paddingDays = start.getDay(); // 0 = dimanche
+    const lastOfEnd = new Date(this.endMonth.getFullYear(), this.endMonth.getMonth() + 1, 0);
 
     const cells: DayCell[] = [];
     for (let i = 0; i < paddingDays; i++) {
@@ -57,10 +69,10 @@ export class ContributionGraphComponent implements OnChanges {
     }
 
     let count = 0;
-    const cursor = new Date(jan1);
-    while (cursor <= dec31) {
+    const cursor = new Date(start);
+    while (cursor <= lastOfEnd) {
       const iso = this.toIso(cursor);
-      const isFuture = cursor.getTime() > today.getTime();
+      const isFuture = cursor.getTime() > this.today.getTime();
       const active = !isFuture && this.activeDates.has(iso);
       if (active) count++;
       cells.push({
@@ -68,7 +80,7 @@ export class ContributionGraphComponent implements OnChanges {
         iso,
         active,
         isFuture,
-        isToday: cursor.getTime() === today.getTime()
+        isToday: cursor.getTime() === this.today.getTime()
       });
       cursor.setDate(cursor.getDate() + 1);
     }
@@ -78,12 +90,22 @@ export class ContributionGraphComponent implements OnChanges {
     this.totalCols = Math.ceil(cells.length / 7);
 
     const labels: MonthLabel[] = [];
-    for (let m = 0; m < 12; m++) {
-      const firstOfMonth = new Date(this.year, m, 1);
-      const idx = paddingDays + Math.round((firstOfMonth.getTime() - jan1.getTime()) / 86400000);
+    let m = start.getMonth();
+    let year = start.getFullYear();
+    for (let i = 0; i < 6; i++) {
+      const firstOfMonth = new Date(year, m, 1);
+      const idx = paddingDays + Math.round((firstOfMonth.getTime() - start.getTime()) / 86400000);
       labels.push({ name: MOIS_COURT[m], col: Math.floor(idx / 7) + 1 });
+      m++;
+      if (m > 11) {
+        m = 0;
+        year++;
+      }
     }
     this.monthLabels = labels;
+
+    const fmt = (d: Date) => d.toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' });
+    this.intervalLabel = `${fmt(start)} – ${fmt(this.endMonth)}`;
   }
 
   tooltip(cell: DayCell): string {

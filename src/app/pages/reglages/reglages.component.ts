@@ -3,11 +3,12 @@ import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { StorageService } from '../../services/storage.service';
 import { AuthService } from '../../services/auth.service';
+import { ExercicesComponent } from '../exercices/exercices.component';
 
 @Component({
   selector: 'app-reglages',
   standalone: true,
-  imports: [FormsModule, RouterLink],
+  imports: [FormsModule, RouterLink, ExercicesComponent],
   templateUrl: './reglages.component.html',
   styleUrl: './reglages.component.scss',
 })

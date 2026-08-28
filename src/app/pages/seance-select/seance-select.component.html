@@ -1,35 +1,20 @@
-<h1>Quelle séance aujourd'hui ?</h1>
-<p>Suggestion basée sur ta rotation A → B → C.</p>
+<h1>Bon entraînement !</h1>
 
-<div class="seance-grid">
-  @for (s of program(); track s.code) {
-    <button
-      type="button"
-      class="seance-card"
-      [class.suggested]="s.code === suggestion()"
-      (click)="demarrer(s.code)"
-    >
-      <span class="code">{{ s.code }}</span>
-      <span class="label">{{ s.label }}</span>
-      <span class="count">{{ s.exercices.length }} exercices</span>
-      @if (s.code === suggestion()) {
-        <span class="badge">Suggérée</span>
-      }
-    </button>
-  }
-</div>
+<button type="button" class="start-btn" (click)="nouvelleSeance()">
+  <span class="start-title">Nouvelle séance</span>
+  <span class="start-sub">Débuter une séance d'aujourd'hui</span>
+</button>
 
 @if (dernieresSessions().length) {
   <div class="card">
     <h3>Dernières séances</h3>
     @for (s of dernieresSessions(); track s.id) {
-      <a
-        class="recent-row"
-        [routerLink]="['/session', s.id]"
-      >
-        <span class="pill">{{ s.seanceCode }}</span>
-        <span>{{ dateCourte(s.date) }}</span>
-        <span class="muted">{{ s.exercices.length }} exercices notés</span>
+      <a class="recent-row" [routerLink]="['/session', s.id]">
+        <span class="date">{{ dateCourte(s.date) }}</span>
+        <span class="muted">{{ s.exercices.length }} exercice(s)</span>
+        @if (s.exercices[0]) {
+          <span class="first-ex">{{ s.exercices[0].exerciceNom }}</span>
+        }
       </a>
     }
   </div>

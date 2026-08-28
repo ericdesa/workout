@@ -1,13 +1,19 @@
 import { Injectable, signal } from '@angular/core';
-import { ProgramSeance, SessionLog } from '../models/fitness.model';
-import { PROGRAM } from '../data/program';
+import { Exercise, ExerciseLog, SessionLog } from '../models/fitness.model';
+import { EXERCICES_INITIAUX } from '../data/exercices';
 import { SupabaseService } from './supabase.service';
 import { AuthService } from './auth.service';
+
+export interface LastPerformance {
+  date: string;
+  log: ExerciseLog;
+  ago: number; // nombre de séances écoulées depuis
+}
 
 @Injectable({ providedIn: 'root' })
 export class StorageService {
   readonly sessions = signal<SessionLog[]>([]);
-  readonly program = signal<ProgramSeance[]>(PROGRAM);
+  readonly exercices = signal<Exercise[]>([]);
 
   constructor(private supabase: SupabaseService, private auth: AuthService) {}
 
@@ -28,39 +34,76 @@ export class StorageService {
       (data ?? []).map((row: any) => ({
         id: row.id,
         date: row.date,
-        seanceCode: row.seance_code,
-        exercices: row.exercices,
-        notes: row.notes
+        exercices: row.exercices ?? [],
+        notes: row.notes ?? ''
       }))
     );
   }
 
-  async loadProgram(): Promise<void> {
+  async loadExercices(): Promise<void> {
     const { data, error } = await this.supabase.client
-      .from('user_program')
-      .select('program')
+      .from('exercices')
+      .select('*')
       .eq('user_id', this.uid())
-      .maybeSingle();
+      .order('created_at', { ascending: true });
     if (error) throw error;
-    if (data?.program) {
-      this.program.set(data.program as ProgramSeance[]);
-    } else {
-      this.program.set(PROGRAM);
+    let list: Exercise[] = (data ?? []).map((row: any) => ({
+      id: row.id,
+      nom: row.nom,
+      type: row.type
+    }));
+    if (list.length === 0) {
+      await this.seedExercices();
+      list = EXERCICES_INITIAUX;
     }
+    this.exercices.set(list);
   }
 
-  async saveProgram(seances: ProgramSeance[]): Promise<void> {
-    const { error } = await this.supabase.client.from('user_program').upsert(
-      { user_id: this.uid(), program: seances },
-      { onConflict: 'user_id' }
-    );
+  private async seedExercices(): Promise<void> {
+    const rows = EXERCICES_INITIAUX.map((e) => ({
+      id: e.id,
+      user_id: this.uid(),
+      nom: e.nom,
+      type: e.type,
+      created_at: new Date().toISOString()
+    }));
+    const { error } = await this.supabase.client.from('exercices').insert(rows);
     if (error) throw error;
-    this.program.set(seances);
   }
 
-  async resetProgram(): Promise<void> {
-    await this.supabase.client.from('user_program').delete().eq('user_id', this.uid());
-    this.program.set(PROGRAM);
+  async addExercice(ex: Pick<Exercise, 'nom' | 'type'>): Promise<Exercise> {
+    const id = 'ex-' + crypto.randomUUID().slice(0, 12);
+    const { error } = await this.supabase.client.from('exercices').insert({
+      id,
+      user_id: this.uid(),
+      nom: ex.nom,
+      type: ex.type,
+      created_at: new Date().toISOString()
+    });
+    if (error) throw error;
+    const created: Exercise = { id, nom: ex.nom, type: ex.type };
+    this.exercices.set([...this.exercices(), created]);
+    return created;
+  }
+
+  async updateExercice(ex: Exercise): Promise<void> {
+    const { error } = await this.supabase.client
+      .from('exercices')
+      .update({ nom: ex.nom, type: ex.type })
+      .eq('id', ex.id)
+      .eq('user_id', this.uid());
+    if (error) throw error;
+    this.exercices.set(this.exercices().map((e) => (e.id === ex.id ? ex : e)));
+  }
+
+  async deleteExercice(id: string): Promise<void> {
+    const { error } = await this.supabase.client
+      .from('exercices')
+      .delete()
+      .eq('id', id)
+      .eq('user_id', this.uid());
+    if (error) throw error;
+    this.exercices.set(this.exercices().filter((e) => e.id !== id));
   }
 
   async saveSession(session: SessionLog): Promise<void> {
@@ -69,7 +112,6 @@ export class StorageService {
         id: session.id,
         user_id: this.uid(),
         date: session.date,
-        seance_code: session.seanceCode,
         exercices: session.exercices,
         notes: session.notes
       },
@@ -100,19 +142,19 @@ export class StorageService {
     return this.sessions().find((s) => s.id === id);
   }
 
-  getLastExerciseLog(exerciceId: string, excludeSessionId?: string) {
-    const sessions = this.sessions().filter((s) => s.id !== excludeSessionId);
-    for (const session of sessions) {
-      const found = session.exercices.find((e) => e.exerciceId === exerciceId);
+  getLastPerformance(exerciceId: string, excludeSessionId?: string): LastPerformance | null {
+    const list = this.sessions().filter((s) => s.id !== excludeSessionId);
+    for (let i = 0; i < list.length; i++) {
+      const found = list[i].exercices.find((e) => e.exerciceId === exerciceId);
       if (found) {
-        return { date: session.date, log: found };
+        return { date: list[i].date, log: found, ago: i + 1 };
       }
     }
     return null;
   }
 
   exportJson(): string {
-    const data = { version: 1, sessions: this.sessions() };
+    const data = { version: 2, sessions: this.sessions() };
     return JSON.stringify(data, null, 2);
   }
 
@@ -138,7 +180,6 @@ export class StorageService {
       id: s.id,
       user_id: this.uid(),
       date: s.date,
-      seance_code: s.seanceCode,
       exercices: s.exercices,
       notes: s.notes
     }));

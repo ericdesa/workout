@@ -8,27 +8,29 @@ import { StorageService } from './services/storage.service';
   standalone: true,
   imports: [RouterOutlet, RouterLink, RouterLinkActive],
   templateUrl: './app.component.html',
-  styleUrl: './app.component.scss'
+  styleUrl: './app.component.scss',
 })
 export class AppComponent {
   readonly userEmail = computed(() => this.auth.user()?.email ?? null);
 
-  constructor(public auth: AuthService, private storage: StorageService) {
-    this.auth['supabase'].client.auth.onAuthStateChange(async (_event, session) => {
-      if (session?.user) {
-        await Promise.all([this.storage.loadSessions(), this.storage.loadProgram()]);
-      }
-    });
+  constructor(
+    public auth: AuthService,
+    private storage: StorageService,
+  ) {
+    this.auth['supabase'].client.auth.onAuthStateChange(
+      async (_event, session) => {
+        if (session?.user) {
+          await Promise.all([
+            this.storage.loadSessions(),
+            this.storage.loadExercices(),
+          ]);
+        }
+      },
+    );
 
     if (this.auth.isLoggedIn()) {
       this.storage.loadSessions();
-      this.storage.loadProgram();
+      this.storage.loadExercices();
     }
-  }
-
-  async logout(): Promise<void> {
-    await this.auth.signOut();
-    this.storage.sessions.set([]);
-    this.storage.program.set([]);
   }
 }

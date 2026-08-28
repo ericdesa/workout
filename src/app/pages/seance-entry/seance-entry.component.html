@@ -1,6 +1,6 @@
 <div class="page-header">
   <a routerLink="/accueil" class="back">← Séances</a>
-  <h1>{{ label }}</h1>
+  <h1>Nouvelle séance</h1>
   <p class="muted">{{ aujourdhui | date: 'EEEE d MMMM' : '' : 'fr-FR' }}</p>
   @if (saveStatus !== 'idle') {
     <div class="save-status">
@@ -17,19 +17,57 @@
   }
 </div>
 
+<div class="card add-exercise-card">
+  <h3>Ajouter un exercice</h3>
+  @if (exercicesDisponibles.length > 0) {
+    <select (change)="ajouterExercice($any($event.target).value)">
+      <option value="">— Choisir un exercice —</option>
+      @for (ex of exercicesDisponibles; track ex.id) {
+        <option [value]="ex.id">{{ optionLabel(ex) }}</option>
+      }
+    </select>
+  } @else {
+    <p class="muted">Tous les exercices sont déjà dans la séance.</p>
+  }
+</div>
+
+@if (!rows.length) {
+  <div class="card empty-card">
+    <p class="empty-state">Aucun exercice ajouté pour l'instant.</p>
+  </div>
+}
+
 @for (row of rows; track row.exerciceId; let ri = $index) {
   <div class="card exercise-card" [class.exercise-done]="isDone(row)">
     <div class="exercise-head">
       <h2>{{ row.exerciceNom }}</h2>
-      <div class="exercise-head-actions">
-        <span class="target">{{ row.seriesCible }} × {{ row.repsLabel }} · repos {{ row.reposLabel }}</span>
-        <button type="button" class="icon-btn delete-exercise" (click)="supprimerExercice(ri)" aria-label="Supprimer l'exercice">✕</button>
-      </div>
+      <button
+        type="button"
+        class="icon-btn delete-exercise"
+        (click)="supprimerExercice(ri)"
+        aria-label="Supprimer l'exercice"
+      >
+        ✕
+      </button>
     </div>
-    <p class="last-time">🕓 Dernière fois : {{ dernierResume(row) }}</p>
-    @if (row.dernier?.log.commentaire) {
-      <p class="last-comment muted">
-        « {{ row.dernier.log.commentaire }} »
+
+    <div class="position-row">
+      <label for="pos-{{ row.exerciceId }}">Position appareil</label>
+      <input
+        id="pos-{{ row.exerciceId }}"
+        type="number"
+        inputmode="numeric"
+        min="0"
+        [(ngModel)]="row.position"
+        (ngModelChange)="scheduleAutoSave()"
+        placeholder="–"
+      />
+    </div>
+
+    @if (row.dernier) {
+      <p class="last-time">
+        🕓 Dernière perf : {{ perfResume(row.dernier) }}
+        <span class="ago-pill">{{ agoLabel(row.dernier.ago) }}</span>
       </p>
     }
 
@@ -44,27 +82,76 @@
         @for (set of row.sets; track $index; let si = $index) {
           <div class="sets-row">
             <span>{{ si + 1 }}</span>
-            <input type="number" inputmode="decimal" step="0.5" min="0" [(ngModel)]="set.kg" (ngModelChange)="scheduleAutoSave()" placeholder="kg" />
-            <input type="number" inputmode="numeric" min="0" [(ngModel)]="set.reps" (ngModelChange)="scheduleAutoSave()" placeholder="reps" />
-            <button type="button" class="icon-btn" (click)="retirerSerie(row, si)" aria-label="Retirer la série">✕</button>
+            <input
+              type="number"
+              inputmode="decimal"
+              step="0.5"
+              min="0"
+              [(ngModel)]="set.kg"
+              (ngModelChange)="scheduleAutoSave()"
+              placeholder="kg"
+            />
+            <input
+              type="number"
+              inputmode="numeric"
+              min="0"
+              [(ngModel)]="set.reps"
+              (ngModelChange)="scheduleAutoSave()"
+              placeholder="reps"
+            />
+            <button
+              type="button"
+              class="icon-btn"
+              (click)="retirerSerie(row, si)"
+              aria-label="Retirer la série"
+            >
+              ✕
+            </button>
           </div>
         }
       </div>
-      <button type="button" class="btn add-set" (click)="ajouterSerie(row)">+ Ajouter une série</button>
+      <button type="button" class="btn add-set" (click)="ajouterSerie(row)">
+        + Ajouter une série
+      </button>
     } @else {
       <div class="cardio-inputs">
         <div class="cardio-field">
           <label>Distance</label>
           <div class="input-with-unit">
-            <input type="number" inputmode="decimal" step="0.1" min="0" [(ngModel)]="row.distance" (ngModelChange)="scheduleAutoSave()" placeholder="0.0" />
-            <span class="unit">km</span>
+            <input
+              type="number"
+              inputmode="decimal"
+              min="1"
+              [(ngModel)]="row.distance"
+              (ngModelChange)="scheduleAutoSave()"
+              placeholder="0"
+            />
+            <span class="unit">m</span>
           </div>
         </div>
         <div class="cardio-field">
           <label>Durée</label>
           <div class="input-with-unit">
-            <input type="number" inputmode="numeric" min="0" [(ngModel)]="row.duration" (ngModelChange)="scheduleAutoSave()" placeholder="0" />
+            <input
+              type="number"
+              inputmode="numeric"
+              min="0"
+              max="59"
+              [(ngModel)]="row.dureeMin"
+              (ngModelChange)="scheduleAutoSave()"
+              placeholder="0"
+            />
             <span class="unit">min</span>
+            <input
+              type="number"
+              inputmode="numeric"
+              min="0"
+              max="59"
+              [(ngModel)]="row.dureeSec"
+              (ngModelChange)="scheduleAutoSave()"
+              placeholder="0"
+            />
+            <span class="unit">s</span>
           </div>
         </div>
       </div>
@@ -77,71 +164,32 @@
           <option [ngValue]="d.value">{{ d.label }}</option>
         }
       </select>
-      <label class="douleur-toggle">
-        <input type="checkbox" [(ngModel)]="row.douleur" (ngModelChange)="scheduleAutoSave()" />
-        Douleur
-      </label>
     </div>
-    <input type="text" class="comment-input" [(ngModel)]="row.commentaire" (ngModelChange)="scheduleAutoSave()" placeholder="Commentaire (optionnel)" />
-  </div>
-}
-
-@if (!showAddExercise) {
-  <div class="card add-exercise-card">
-    <button type="button" class="btn btn-block add-exercise-btn" (click)="toggleAddExercise()">+ Ajouter un exercice</button>
-  </div>
-}
-
-@if (showAddExercise) {
-  <div class="card add-exercise-form">
-    <h3>Ajouter un exercice</h3>
-    <div class="add-mode-tabs">
-      <button type="button" class="tab" [class.active]="addPicker.mode === 'program'" (click)="addPicker.mode = 'program'">Exercice du programme</button>
-      <button type="button" class="tab" [class.active]="addPicker.mode === 'custom'" (click)="addPicker.mode = 'custom'">Exercice libre</button>
-    </div>
-
-    @if (addPicker.mode === 'program') {
-      @if (availableProgramExercises().length > 0) {
-        <select [(ngModel)]="addPicker.programExerciseId">
-          @for (pe of availableProgramExercises(); track pe.id) {
-            <option [ngValue]="pe.id">{{ pe.nom }} ({{ pe.type }})</option>
-          }
-        </select>
-      }
-      @if (availableProgramExercises().length === 0) {
-        <p class="muted">Tous les exercices du programme sont déjà dans la séance.</p>
-      }
-    }
-
-    @if (addPicker.mode === 'custom') {
-      <div class="custom-exercise-fields">
-        <input type="text" [(ngModel)]="addPicker.customName" placeholder="Nom de l'exercice" />
-        <div class="custom-row">
-          <select [(ngModel)]="addPicker.customType">
-            <option value="musculation">Musculation</option>
-            <option value="cardio">Cardio</option>
-          </select>
-          @if (addPicker.customType === 'musculation') {
-            <input type="number" inputmode="numeric" min="1" [(ngModel)]="addPicker.customSeries" placeholder="Séries" />
-            <input type="text" [(ngModel)]="addPicker.customRepsLabel" placeholder="Reps" />
-            <input type="text" [(ngModel)]="addPicker.customReposLabel" placeholder="Repos" />
-          }
-        </div>
-      </div>
-    }
-
-    <div class="add-exercise-actions">
-      <button type="button" class="btn btn-primary" (click)="ajouterExercice()" [disabled]="addPicker.mode === 'program' && !addPicker.programExerciseId">Ajouter</button>
-      <button type="button" class="btn" (click)="toggleAddExercise()">Annuler</button>
-    </div>
+    <input
+      type="text"
+      class="comment-input"
+      [(ngModel)]="row.commentaire"
+      (ngModelChange)="scheduleAutoSave()"
+      placeholder="Commentaire (optionnel)"
+    />
   </div>
 }
 
 <div class="card">
   <h3>Notes de séance</h3>
-  <textarea rows="3" [(ngModel)]="notes" (ngModelChange)="scheduleAutoSave()" placeholder="Forme du jour, sensations générales..."></textarea>
+  <textarea
+    rows="3"
+    [(ngModel)]="notes"
+    (ngModelChange)="scheduleAutoSave()"
+    placeholder="Forme du jour, sensations générales..."
+  ></textarea>
 </div>
 
-<button type="button" class="btn btn-primary btn-block save-btn" (click)="enregistrer()">
+<button
+  type="button"
+  class="btn btn-primary btn-block save-btn"
+  (click)="enregistrer()"
+  [disabled]="!rows.length"
+>
   ✓ Enregistrer la séance
 </button>

@@ -1,4 +1,4 @@
-import { Component, computed, signal } from '@angular/core';
+import { Component, computed } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { StorageService } from '../../services/storage.service';
 import { ContributionGraphComponent } from '../../components/contribution-graph/contribution-graph.component';
@@ -11,8 +11,6 @@ import { ContributionGraphComponent } from '../../components/contribution-graph/
   styleUrl: './history.component.scss'
 })
 export class HistoryComponent {
-  readonly year = signal(new Date().getFullYear());
-
   readonly activeDates = computed(() => new Set(this.storage.sessions().map((s) => s.date)));
 
   readonly sessions = computed(() => this.storage.sessions());
@@ -20,10 +18,6 @@ export class HistoryComponent {
   readonly streak = computed(() => this.computeStreakSemaines());
 
   constructor(private storage: StorageService) {}
-
-  changerAnnee(delta: number): void {
-    this.year.update((y) => y + delta);
-  }
 
   dateLongue(iso: string): string {
     return new Date(iso).toLocaleDateString('fr-FR', { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' });

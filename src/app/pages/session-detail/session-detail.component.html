@@ -5,7 +5,7 @@
 @if (session; as s) {
   <div class="page-header">
     <a routerLink="/historique" class="back">← Historique</a>
-    <h1>Séance {{ s.seanceCode }}</h1>
+    <h1>Séance</h1>
     <p class="muted date-txt">{{ dateLongue(s.date) }}</p>
     <input type="date" [(ngModel)]="s.date" (ngModelChange)="scheduleAutoSave()" class="date-input" />
     @if (saveStatus !== 'idle') {
@@ -31,14 +31,24 @@
           @if (ex.difficulte) {
             <span class="pill" [class]="'pill-' + ex.difficulte">{{ difficulteLabels[ex.difficulte!] }}</span>
           }
-          @if (ex.douleur) {
-            <span class="pill pill-douleur">Douleur</span>
-          }
           <button type="button" class="icon-btn delete-exercise" (click)="supprimerExercice(ri)" aria-label="Supprimer l'exercice">✕</button>
         </div>
       </div>
 
-      @if (!isCardio(ex)) {
+      <div class="position-row">
+        <label for="pos-{{ ex.exerciceId }}">Position appareil</label>
+        <input
+          id="pos-{{ ex.exerciceId }}"
+          type="number"
+          inputmode="numeric"
+          min="0"
+          [(ngModel)]="ex.position"
+          (ngModelChange)="scheduleAutoSave()"
+          placeholder="–"
+        />
+      </div>
+
+      @if (ex.type === 'musculation') {
         <div class="sets-table">
           <div class="sets-row sets-row-head">
             <span>Série</span>
@@ -61,15 +71,17 @@
           <div class="cardio-field">
             <label>Distance</label>
             <div class="input-with-unit">
-              <input type="number" inputmode="decimal" step="0.1" min="0" [(ngModel)]="ex.distance" (ngModelChange)="scheduleAutoSave()" placeholder="0.0" />
-              <span class="unit">km</span>
+              <input type="number" inputmode="decimal" min="1" [(ngModel)]="ex.distance" (ngModelChange)="scheduleAutoSave()" placeholder="0" />
+              <span class="unit">m</span>
             </div>
           </div>
           <div class="cardio-field">
             <label>Durée</label>
             <div class="input-with-unit">
-              <input type="number" inputmode="numeric" min="0" [(ngModel)]="ex.duration" (ngModelChange)="scheduleAutoSave()" placeholder="0" />
+              <input type="number" inputmode="numeric" min="0" max="59" [(ngModel)]="ex.dureeMin" (ngModelChange)="scheduleAutoSave()" placeholder="0" />
               <span class="unit">min</span>
+              <input type="number" inputmode="numeric" min="0" max="59" [(ngModel)]="ex.dureeSec" (ngModelChange)="scheduleAutoSave()" placeholder="0" />
+              <span class="unit">s</span>
             </div>
           </div>
         </div>
@@ -82,10 +94,6 @@
             <option [ngValue]="d.value">{{ d.label }}</option>
           }
         </select>
-        <label class="douleur-toggle">
-          <input type="checkbox" [(ngModel)]="ex.douleur" (ngModelChange)="scheduleAutoSave()" />
-          Douleur
-        </label>
       </div>
       <input type="text" class="comment-input" [(ngModel)]="ex.commentaire" (ngModelChange)="scheduleAutoSave()" placeholder="Commentaire" />
     </div>
@@ -100,43 +108,17 @@
   @if (showAddExercise) {
     <div class="card add-exercise-form">
       <h3>Ajouter un exercice</h3>
-      <div class="add-mode-tabs">
-        <button type="button" class="tab" [class.active]="addPicker.mode === 'program'" (click)="addPicker.mode = 'program'">Exercice du programme</button>
-        <button type="button" class="tab" [class.active]="addPicker.mode === 'custom'" (click)="addPicker.mode = 'custom'">Exercice libre</button>
-      </div>
-
-      @if (addPicker.mode === 'program') {
-        @if (availableProgramExercises().length > 0) {
-          <select [(ngModel)]="addPicker.programExerciseId">
-            @for (pe of availableProgramExercises(); track pe.id) {
-              <option [ngValue]="pe.id">{{ pe.nom }}</option>
-            }
-          </select>
-        }
-        @if (availableProgramExercises().length === 0) {
-          <p class="muted">Tous les exercices du programme sont déjà dans la séance.</p>
-        }
+      @if (availableExercises().length > 0) {
+        <select [(ngModel)]="selectedToAdd">
+          @for (ex of availableExercises(); track ex.id) {
+            <option [ngValue]="ex.id">{{ ex.nom }} ({{ ex.type === 'musculation' ? 'Musculation' : 'Cardio' }})</option>
+          }
+        </select>
+      } @else {
+        <p class="muted">Tous les exercices sont déjà dans la séance.</p>
       }
-
-      @if (addPicker.mode === 'custom') {
-        <div class="custom-exercise-fields">
-          <input type="text" [(ngModel)]="addPicker.customName" placeholder="Nom de l'exercice" />
-          <div class="custom-row">
-            <select [(ngModel)]="addPicker.customType">
-              <option value="musculation">Musculation</option>
-              <option value="cardio">Cardio</option>
-            </select>
-            @if (addPicker.customType === 'musculation') {
-              <input type="number" inputmode="numeric" min="1" [(ngModel)]="addPicker.customSeries" placeholder="Séries" />
-              <input type="text" [(ngModel)]="addPicker.customRepsLabel" placeholder="Reps" />
-              <input type="text" [(ngModel)]="addPicker.customReposLabel" placeholder="Repos" />
-            }
-          </div>
-        </div>
-      }
-
       <div class="add-exercise-actions">
-        <button type="button" class="btn btn-primary" (click)="ajouterExercice()" [disabled]="addPicker.mode === 'program' && !addPicker.programExerciseId">Ajouter</button>
+        <button type="button" class="btn btn-primary" (click)="ajouterExercice()" [disabled]="!selectedToAdd">Ajouter</button>
         <button type="button" class="btn" (click)="toggleAddExercise()">Annuler</button>
       </div>
     </div>

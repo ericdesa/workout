@@ -17,7 +17,7 @@ export const routes: Routes = [
     canMatch: [authGuard]
   },
   {
-    path: 'seance/:code',
+    path: 'seance',
     loadComponent: () => import('./pages/seance-entry/seance-entry.component').then((m) => m.SeanceEntryComponent),
     canMatch: [authGuard]
   },
@@ -29,11 +29,6 @@ export const routes: Routes = [
   {
     path: 'session/:id',
     loadComponent: () => import('./pages/session-detail/session-detail.component').then((m) => m.SessionDetailComponent),
-    canMatch: [authGuard]
-  },
-  {
-    path: 'programme',
-    loadComponent: () => import('./pages/programme/programme.component').then((m) => m.ProgrammeComponent),
     canMatch: [authGuard]
   },
   {

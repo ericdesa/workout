@@ -1,0 +1,66 @@
+<h1>Exercices</h1>
+<p class="muted">
+  {{ muscuCount() }} musculation · {{ cardioCount() }} cardio
+</p>
+
+<div class="card add-card">
+  <h3>Nouvel exercice</h3>
+  <div class="add-row">
+    <input
+      type="text"
+      [(ngModel)]="newNom"
+      placeholder="Nom de l'exercice"
+      (keydown.enter)="ajouter()"
+    />
+    <select [(ngModel)]="newType">
+      <option value="musculation">Musculation</option>
+      <option value="cardio">Cardio</option>
+    </select>
+    <button
+      type="button"
+      class="btn btn-primary"
+      (click)="ajouter()"
+      [disabled]="saving() || !newNom.trim()"
+    >
+      Ajouter
+    </button>
+  </div>
+</div>
+
+<div class="card">
+  @if (!exercices().length) {
+    <p class="empty-state">Aucun exercice. Ajoute-en un pour commencer.</p>
+  }
+  <ul class="ex-list">
+    @for (ex of exercices(); track ex.id) {
+      <li class="ex-row">
+        @if (editing()?.id === ex.id) {
+          <div class="edit-row">
+            <input type="text" [(ngModel)]="editing()!.nom" />
+            <select [(ngModel)]="editing()!.type">
+              <option value="musculation">Musculation</option>
+              <option value="cardio">Cardio</option>
+            </select>
+            <div class="row-actions">
+              <button type="button" class="btn btn-primary" (click)="saveEdit()" [disabled]="saving()">✓</button>
+              <button type="button" class="btn" (click)="annulerEdit()">Annuler</button>
+            </div>
+          </div>
+        } @else {
+          <span class="ex-nom">{{ ex.nom }}</span>
+          <span class="pill" [class.muscu]="ex.type === 'musculation'" [class.cardio]="ex.type === 'cardio'">
+            {{ ex.type === 'musculation' ? 'Musculation' : 'Cardio' }}
+          </span>
+          <div class="row-actions">
+            <button type="button" class="icon-btn" (click)="startEdit(ex)" aria-label="Modifier">✏️</button>
+            <button type="button" class="icon-btn danger" (click)="supprimer(ex)" aria-label="Supprimer">✕</button>
+          </div>
+        }
+      </li>
+    }
+  </ul>
+</div>
+
+@if (message()) {
+  <p class="message">{{ message() }}</p>
+}

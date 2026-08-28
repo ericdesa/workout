@@ -4,15 +4,11 @@
     <nav class="nav-desktop">
       <a routerLink="/accueil" routerLinkActive="active">Séance</a>
       <a routerLink="/historique" routerLinkActive="active">Historique</a>
-      <a routerLink="/programme" routerLinkActive="active">Programme</a>
       <a routerLink="/reglages" routerLinkActive="active">Réglages</a>
     </nav>
     @if (userEmail()) {
       <div class="user-info">
         <span class="user-email">{{ userEmail() }}</span>
-        <button type="button" class="btn btn-logout" (click)="logout()">
-          Déconnexion
-        </button>
       </div>
     }
   </header>
@@ -27,9 +23,6 @@
     </a>
     <a routerLink="/historique" routerLinkActive="active">
       <span class="icon">📅</span><span>Historique</span>
-    </a>
-    <a routerLink="/programme" routerLinkActive="active">
-      <span class="icon">📋</span><span>Programme</span>
     </a>
     <a routerLink="/reglages" routerLinkActive="active">
       <span class="icon">⚙️</span><span>Réglages</span>

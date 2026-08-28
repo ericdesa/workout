@@ -2,7 +2,7 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { StorageService } from '../../services/storage.service';
-import { DIFFICULTE_LABELS, Difficulte, ExerciseLog, ExerciseType, ProgramExercise, SessionLog } from '../../models/fitness.model';
+import { DIFFICULTE_LABELS, Difficulte, ExerciseLog, Exercise, SessionLog } from '../../models/fitness.model';
 
 @Component({
   selector: 'app-session-detail',
@@ -16,19 +16,10 @@ export class SessionDetailComponent implements OnInit, OnDestroy {
   notFound = false;
   confirmDelete = false;
   showAddExercise = false;
+  selectedToAdd = '';
   saveStatus: 'idle' | 'saving' | 'saved' | 'error' = 'idle';
   saveError = '';
   hasChanges = false;
-  addPicker = {
-    mode: 'program' as 'program' | 'custom',
-    programExerciseId: '',
-    customName: '',
-    customType: 'musculation' as ExerciseType,
-    customSeries: 3,
-    customRepsLabel: '10–12',
-    customReposLabel: '90 s'
-  };
-  private programExercices: ProgramExercise[] = [];
   private autoSaveTimer: ReturnType<typeof setTimeout> | null = null;
   readonly difficulteLabels = DIFFICULTE_LABELS;
   readonly difficulteOptions: { value: Difficulte; label: string }[] = (
@@ -45,10 +36,7 @@ export class SessionDetailComponent implements OnInit, OnDestroy {
       return;
     }
     this.session = JSON.parse(JSON.stringify(found));
-
-    const seance = this.storage.program().find((p) => p.code === this.session!.seanceCode);
-    this.programExercices = seance?.exercices ?? [];
-    this.addPicker.programExerciseId = this.availableProgramExercises()[0]?.id ?? '';
+    this.selectedToAdd = this.availableExercises()[0]?.id ?? '';
   }
 
   ngOnDestroy(): void {
@@ -76,75 +64,63 @@ export class SessionDetailComponent implements OnInit, OnDestroy {
   }
 
   isDone(ex: ExerciseLog): boolean {
-    if (this.isCardio(ex)) {
-      return ex.distance != null || ex.duration != null;
+    if (ex.type === 'cardio') {
+      return ex.distance != null || ex.dureeMin != null || ex.dureeSec != null;
     }
     return ex.sets.some((s) => s.kg != null || s.reps != null);
   }
 
-  isCardio(ex: ExerciseLog): boolean {
-    if (ex.exerciceId.startsWith('custom-')) {
-      return ex.distance != null || ex.duration != null;
-    }
-    const allExercices = this.storage.program().flatMap((s) => s.exercices);
-    const found = allExercices.find((e) => e.id === ex.exerciceId);
-    return found?.type === 'cardio';
-  }
-
-  ajouterSerie(ex: SessionLog['exercices'][number]): void {
+  ajouterSerie(ex: ExerciseLog): void {
     const last = ex.sets[ex.sets.length - 1];
     ex.sets.push({ kg: last?.kg ?? null, reps: null });
+    this.scheduleAutoSave();
   }
 
-  retirerSerie(ex: SessionLog['exercices'][number], i: number): void {
+  retirerSerie(ex: ExerciseLog, i: number): void {
     ex.sets.splice(i, 1);
+    this.scheduleAutoSave();
   }
 
   supprimerExercice(index: number): void {
     this.session!.exercices.splice(index, 1);
+    this.scheduleAutoSave();
   }
 
-  availableProgramExercises(): ProgramExercise[] {
+  availableExercises(): Exercise[] {
     const usedIds = new Set(this.session!.exercices.map((e) => e.exerciceId));
-    return this.programExercices.filter((pe) => !usedIds.has(pe.id));
+    const list = this.storage.exercices().filter((e) => !usedIds.has(e.id));
+    return [...list].sort((a, b) => a.nom.localeCompare(b.nom, 'fr'));
   }
 
   toggleAddExercise(): void {
     this.showAddExercise = !this.showAddExercise;
     if (this.showAddExercise) {
-      this.addPicker.programExerciseId = this.availableProgramExercises()[0]?.id ?? '';
-      this.addPicker.customName = '';
+      this.selectedToAdd = this.availableExercises()[0]?.id ?? '';
     }
   }
 
   ajouterExercice(): void {
-    if (this.addPicker.mode === 'program') {
-      const pe = this.programExercices.find((e) => e.id === this.addPicker.programExerciseId);
-      if (!pe) return;
-      this.session!.exercices.push({
-        exerciceId: pe.id,
-        exerciceNom: pe.nom,
-        sets: pe.type !== 'cardio' ? Array.from({ length: pe.series }, () => ({ kg: null, reps: null })) : [],
-        difficulte: null,
-        douleur: false,
-        commentaire: ''
-      });
-    } else {
-      const name = this.addPicker.customName.trim();
-      if (!name) return;
-      const isCardio = this.addPicker.customType === 'cardio';
-      this.session!.exercices.push({
-        exerciceId: `custom-${Date.now()}`,
-        exerciceNom: name,
-        sets: isCardio ? [] : Array.from({ length: this.addPicker.customSeries }, () => ({ kg: null, reps: null })),
-        distance: isCardio ? null : undefined,
-        duration: isCardio ? null : undefined,
-        difficulte: null,
-        douleur: false,
-        commentaire: ''
-      });
-    }
+    const ex = this.storage.exercices().find((e) => e.id === this.selectedToAdd);
+    if (!ex) return;
+    const dernier = this.storage.getLastPerformance(ex.id, this.session!.id);
+    const dernierSet =
+      ex.type === 'musculation'
+        ? dernier?.log.sets.find((s) => s.kg !== null || s.reps !== null)
+        : undefined;
+    this.session!.exercices.push({
+      exerciceId: ex.id,
+      exerciceNom: ex.nom,
+      type: ex.type,
+      position: dernier?.log.position ?? null,
+      sets: ex.type === 'musculation' ? [{ kg: dernierSet?.kg ?? null, reps: dernierSet?.reps ?? null }] : [],
+      distance: ex.type === 'cardio' ? dernier?.log.distance ?? null : null,
+      dureeMin: ex.type === 'cardio' ? dernier?.log.dureeMin ?? null : null,
+      dureeSec: ex.type === 'cardio' ? dernier?.log.dureeSec ?? null : null,
+      difficulte: dernier?.log.difficulte ?? null,
+      commentaire: ''
+    });
     this.showAddExercise = false;
+    this.scheduleAutoSave();
   }
 
   async enregistrer(): Promise<void> {

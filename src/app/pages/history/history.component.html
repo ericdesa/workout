@@ -1,12 +1,7 @@
 <h1>Historique</h1>
 
 <div class="card">
-  <div class="year-switch">
-    <button type="button" class="icon-btn" (click)="changerAnnee(-1)">‹</button>
-    <strong>{{ year() }}</strong>
-    <button type="button" class="icon-btn" (click)="changerAnnee(1)">›</button>
-  </div>
-  <app-contribution-graph [activeDates]="activeDates()" [year]="year()" />
+  <app-contribution-graph [activeDates]="activeDates()" />
   @if (streak() > 1) {
     <p class="streak">🔥 {{ streak() }} semaines de suite avec au moins une séance</p>
   }
@@ -23,7 +18,6 @@
     <h3>Séances</h3>
     @for (s of sessions(); track s.id) {
       <a class="session-item" [routerLink]="['/session', s.id]">
-        <span class="pill">{{ s.seanceCode }}</span>
         <span class="date">{{ dateLongue(s.date) }}</span>
         <span class="muted">{{ s.exercices.length }} exercices</span>
       </a>

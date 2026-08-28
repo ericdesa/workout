@@ -2,6 +2,36 @@
   overflow-x: auto;
 }
 
+.graph-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+  position: sticky;
+  left: 0;
+}
+
+.interval {
+  font-size: 13px;
+  text-transform: capitalize;
+  white-space: nowrap;
+}
+
+.icon-btn {
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  color: var(--text);
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.icon-btn:hover {
+  border-color: var(--accent);
+}
+
 .graph {
   display: grid;
   grid-auto-flow: column;

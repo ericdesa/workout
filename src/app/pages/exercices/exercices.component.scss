@@ -1,0 +1,121 @@
+.muted {
+  margin-top: 0;
+}
+
+.add-card {
+  padding: 14px 16px;
+}
+
+.add-card h3 {
+  margin: 0 0 10px;
+}
+
+.add-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.add-row input[type="text"] {
+  flex: 1;
+  min-width: 140px;
+  padding: 10px;
+}
+
+.add-row select {
+  padding: 10px 8px;
+}
+
+.ex-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.ex-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 2px;
+  border-bottom: 1px solid var(--border);
+}
+
+.ex-row:last-child {
+  border-bottom: none;
+}
+
+.ex-nom {
+  flex: 1;
+  font-weight: 600;
+}
+
+.pill {
+  font-size: 11px;
+  padding: 3px 8px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+}
+
+.pill.muscu {
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
+.pill.cardio {
+  color: #ff9f43;
+  border-color: #ff9f43;
+}
+
+.row-actions {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+
+.icon-btn {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 16px;
+  padding: 4px 6px;
+}
+
+.icon-btn.danger {
+  color: var(--danger);
+}
+
+.edit-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+  width: 100%;
+}
+
+.edit-row input {
+  flex: 1;
+  min-width: 120px;
+  padding: 8px;
+}
+
+.edit-row select {
+  padding: 8px;
+}
+
+.edit-row .row-actions {
+  margin-left: auto;
+}
+
+.message {
+  text-align: center;
+  color: var(--accent);
+  font-size: 14px;
+  margin-top: 12px;
+}
+
+.empty-state {
+  text-align: center;
+  color: var(--text-muted);
+}

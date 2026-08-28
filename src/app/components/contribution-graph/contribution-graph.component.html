@@ -1,4 +1,10 @@
 <div class="graph-wrap">
+  <div class="graph-toolbar">
+    <button type="button" class="icon-btn" (click)="naviguer(-6)" aria-label="Mois précédents">‹</button>
+    <strong class="interval">{{ intervalLabel }}</strong>
+    <button type="button" class="icon-btn" (click)="naviguer(6)" aria-label="Mois suivants">›</button>
+  </div>
+
   <div class="graph" [style.gridTemplateColumns]="'repeat(' + totalCols + ', 11px)'">
     @for (m of monthLabels; track m.col) {
       <span
@@ -28,5 +34,5 @@
     </div>
   </div>
 
-  <p class="muted total-line">{{ total }} séance(s) en {{ year }}</p>
+  <p class="muted total-line">{{ total }} séance(s) sur l'intervalle affiché</p>
 </div>

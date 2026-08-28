@@ -1,7 +1,6 @@
 import { Component, computed } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { StorageService } from '../../services/storage.service';
-import { SeanceCode } from '../../models/fitness.model';
 
 @Component({
   selector: 'app-seance-select',
@@ -11,29 +10,14 @@ import { SeanceCode } from '../../models/fitness.model';
   styleUrl: './seance-select.component.scss'
 })
 export class SeanceSelectComponent {
-  readonly program = computed(() => this.storage.program());
+  readonly dernieresSessions = computed(() => this.storage.sessions().slice(0, 5));
 
-  readonly derniereSeance = computed<SeanceCode | null>(() => {
-    const sessions = this.storage.sessions();
-    return sessions.length ? sessions[0].seanceCode : null;
-  });
-
-  readonly suggestion = computed(() => {
-    const derniere = this.derniereSeance();
-    const prog = this.program();
-    if (!prog.length) return null;
-    const codes = prog.map((p) => p.code as SeanceCode);
-    if (!derniere) return codes[0];
-    const idx = codes.indexOf(derniere);
-    return codes[(idx + 1) % codes.length];
-  });
-
-  readonly dernieresSessions = computed(() => this.storage.sessions().slice(0, 3));
+  readonly aujourdhui = new Date();
 
   constructor(private storage: StorageService, private router: Router) {}
 
-  demarrer(code: string): void {
-    this.router.navigate(['/seance', code]);
+  nouvelleSeance(): void {
+    this.router.navigate(['/seance']);
   }
 
   dateCourte(iso: string): string {

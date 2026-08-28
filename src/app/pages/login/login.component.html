@@ -2,7 +2,6 @@
   <div class="login-card">
     <div class="logo-big">🏋️</div>
     <h1>Workout</h1>
-    <p class="muted">Connecte-toi pour synchroniser tes séances.</p>
 
     @if (!auth.emailSent()) {
       <form (ngSubmit)="onSubmit()">
@@ -26,7 +25,7 @@
         </button>
       </form>
       <p class="hint">
-        Pas de mot de passe : un lien de connexion t sera envoyé par email.
+        Pas de mot de passe : un lien de connexion te sera envoyé par email.
       </p>
     } @else {
       <div class="sent-notice">
