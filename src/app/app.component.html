@@ -3,8 +3,12 @@
     <span class="logo">🏋️ Workout</span>
     <nav class="nav-desktop">
       <a routerLink="/accueil" routerLinkActive="active">Séance</a>
-      <a routerLink="/historique" routerLinkActive="active">Historique</a>
-      <a routerLink="/reglages" routerLinkActive="active">Réglages</a>
+      @if (userEmail()) {
+        <a routerLink="/historique" routerLinkActive="active">Historique</a>
+        <a routerLink="/reglages" routerLinkActive="active">Réglages</a>
+      } @else {
+        <a routerLink="/debug" routerLinkActive="active">Debug</a>
+      }
     </nav>
     @if (userEmail()) {
       <div class="user-info">
@@ -21,11 +25,17 @@
     <a routerLink="/accueil" routerLinkActive="active">
       <span class="icon">🏠</span><span>Séance</span>
     </a>
-    <a routerLink="/historique" routerLinkActive="active">
-      <span class="icon">📅</span><span>Historique</span>
-    </a>
-    <a routerLink="/reglages" routerLinkActive="active">
-      <span class="icon">⚙️</span><span>Réglages</span>
-    </a>
+    @if (userEmail()) {
+      <a routerLink="/historique" routerLinkActive="active">
+        <span class="icon">📅</span><span>Historique</span>
+      </a>
+      <a routerLink="/reglages" routerLinkActive="active">
+        <span class="icon">⚙️</span><span>Réglages</span>
+      </a>
+    } @else {
+      <a routerLink="/debug" routerLinkActive="active">
+        <span class="icon">🔧</span><span>Debug</span>
+      </a>
+    }
   </nav>
 </div>

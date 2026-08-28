@@ -1,5 +1,5 @@
 import { Component, computed } from '@angular/core';
-import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { AuthService } from './services/auth.service';
 import { StorageService } from './services/storage.service';
 
@@ -16,14 +16,21 @@ export class AppComponent {
   constructor(
     public auth: AuthService,
     private storage: StorageService,
+    private router: Router,
   ) {
     this.auth['supabase'].client.auth.onAuthStateChange(
-      async (_event, session) => {
+      async (event, session) => {
         if (session?.user) {
           await Promise.all([
             this.storage.loadSessions(),
             this.storage.loadExercices(),
           ]);
+        } else {
+          this.storage.sessions.set([]);
+          this.storage.exercices.set([]);
+          if (event === 'SIGNED_OUT') {
+            this.router.navigate(['/login']);
+          }
         }
       },
     );
