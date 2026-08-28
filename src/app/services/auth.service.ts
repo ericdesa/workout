@@ -7,11 +7,13 @@ import { SupabaseService } from './supabase.service';
 export class AuthService {
   private readonly _user = signal<User | null>(null);
   private readonly _loading = signal(true);
+  private readonly _sending = signal(false);
   private readonly _emailSent = signal(false);
   private readonly _error = signal<string | null>(null);
 
   readonly user = computed(() => this._user());
   readonly loading = computed(() => this._loading());
+  readonly sending = computed(() => this._sending());
   readonly emailSent = computed(() => this._emailSent());
   readonly error = computed(() => this._error());
   readonly isLoggedIn = computed(() => !!this._user());
@@ -31,14 +33,19 @@ export class AuthService {
   async signIn(email: string): Promise<void> {
     this._error.set(null);
     this._emailSent.set(false);
-    const { error } = await this.supabase.client.auth.signInWithOtp({
-      email,
-      options: { emailRedirectTo: environment.emailRedirectTo }
-    });
-    if (error) {
-      this._error.set(error.message);
-    } else {
-      this._emailSent.set(true);
+    this._sending.set(true);
+    try {
+      const { error } = await this.supabase.client.auth.signInWithOtp({
+        email,
+        options: { emailRedirectTo: environment.emailRedirectTo }
+      });
+      if (error) {
+        this._error.set(error.message);
+      } else {
+        this._emailSent.set(true);
+      }
+    } finally {
+      this._sending.set(false);
     }
   }
 

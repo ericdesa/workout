@@ -19,9 +19,14 @@
         <button
           type="submit"
           class="btn btn-primary btn-block"
-          [disabled]="auth.loading()"
+          [disabled]="auth.sending()"
         >
-          Recevoir le lien magique
+          @if (auth.sending()) {
+            <span class="spinner" aria-hidden="true"></span>
+            Envoi en cours…
+          } @else {
+            Recevoir le lien magique
+          }
         </button>
       </form>
       <p class="hint">
