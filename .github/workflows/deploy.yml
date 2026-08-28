@@ -24,6 +24,9 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
+      # Injecte le numéro de build GitHub dans l'app (affiché sur /debug)
+      - name: Inject build number
+        run: echo "export const buildNumber = '${{ github.run_number }}';" > src/environments/build.generated.ts
       # Adapte le nom du dépôt après le / si besoin (base href pour GitHub Pages)
       - run: npx ng build --base-href "/${{ github.event.repository.name }}/"
       # GitHub Pages ne gère pas le routing côté serveur : on duplique index.html

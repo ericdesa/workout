@@ -1,29 +1,61 @@
 <h1>Réglages</h1>
-<p class="muted">{{ nbSessions() }} séance(s) enregistrée(s) — données synchronisées avec le cloud.</p>
+<p class="muted">
+  {{ nbSessions() }} séance(s) enregistrée(s) — données synchronisées avec le
+  cloud.
+</p>
 
 <div class="card">
   <h3>Compte</h3>
-  <p>Connecté en tant que <strong>{{ userEmail() }}</strong></p>
-  <button type="button" class="btn btn-block" (click)="deconnexion()">Se déconnecter</button>
+  <p>
+    Connecté en tant que <strong>{{ userEmail() }}</strong>
+  </p>
+  <button type="button" class="btn btn-block" (click)="deconnexion()">
+    Se déconnecter
+  </button>
 </div>
 
 <div class="card">
   <h3>Exporter</h3>
-  <p>Génère un fichier JSON de toutes tes séances, à partager ou joindre par email pour le sauvegarder.</p>
-  <button type="button" class="btn btn-primary btn-block" (click)="exporter()">⬆️ Exporter mes données</button>
-  <button type="button" class="btn btn-block email-btn" (click)="ouvrirEmail()">✉️ Ouvrir un email vide</button>
+  <p>
+    Génère un fichier JSON de toutes tes séances, à partager ou joindre par
+    email pour le sauvegarder.
+  </p>
+  <button type="button" class="btn btn-primary btn-block" (click)="exporter()">
+    ⬆️ Exporter mes données
+  </button>
 </div>
 
 <div class="card">
   <h3>Importer</h3>
   <p>Restaure des séances depuis un fichier JSON précédemment exporté.</p>
   <div class="import-mode">
-    <label><input type="radio" name="mode" value="fusionner" [(ngModel)]="modeImport" /> Fusionner avec les données actuelles</label>
-    <label><input type="radio" name="mode" value="remplacer" [(ngModel)]="modeImport" /> Remplacer toutes les données</label>
+    <label
+      ><input
+        type="radio"
+        name="mode"
+        value="fusionner"
+        [(ngModel)]="modeImport"
+      />
+      Fusionner avec les données actuelles</label
+    >
+    <label
+      ><input
+        type="radio"
+        name="mode"
+        value="remplacer"
+        [(ngModel)]="modeImport"
+      />
+      Remplacer toutes les données</label
+    >
   </div>
   <label class="file-btn btn btn-block">
     📥 Choisir un fichier JSON
-    <input type="file" accept="application/json,.json" (change)="onFichierChoisi($event)" hidden />
+    <input
+      type="file"
+      accept="application/json,.json"
+      (change)="onFichierChoisi($event)"
+      hidden
+    />
   </label>
 </div>
 
@@ -31,13 +63,23 @@
   <h3>Réinitialiser</h3>
   <p>Supprime définitivement toutes les séances enregistrées dans le cloud.</p>
   @if (!confirmReset) {
-    <button type="button" class="btn btn-danger btn-block" (click)="confirmReset = true">Tout supprimer</button>
+    <button
+      type="button"
+      class="btn btn-danger btn-block"
+      (click)="confirmReset = true"
+    >
+      Tout supprimer
+    </button>
   }
   @if (confirmReset) {
     <div class="confirm-row">
       <span class="muted">Confirmer ?</span>
-      <button type="button" class="btn btn-danger" (click)="reinitialiser()">Oui, supprimer</button>
-      <button type="button" class="btn" (click)="confirmReset = false">Annuler</button>
+      <button type="button" class="btn btn-danger" (click)="reinitialiser()">
+        Oui, supprimer
+      </button>
+      <button type="button" class="btn" (click)="confirmReset = false">
+        Annuler
+      </button>
     </div>
   }
 </div>
@@ -45,3 +87,5 @@
 @if (message()) {
   <p class="message">{{ message() }}</p>
 }
+
+<a class="debug-link" routerLink="/debug">🔧 Page de debug</a>

@@ -1,14 +1,15 @@
 import { Component, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { RouterLink } from '@angular/router';
 import { StorageService } from '../../services/storage.service';
 import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-reglages',
   standalone: true,
-  imports: [FormsModule],
+  imports: [FormsModule, RouterLink],
   templateUrl: './reglages.component.html',
-  styleUrl: './reglages.component.scss'
+  styleUrl: './reglages.component.scss',
 })
 export class ReglagesComponent {
   readonly nbSessions = () => this.storage.sessions().length;
@@ -17,7 +18,10 @@ export class ReglagesComponent {
   confirmReset = false;
   modeImport: 'fusionner' | 'remplacer' = 'fusionner';
 
-  constructor(private storage: StorageService, public auth: AuthService) {}
+  constructor(
+    private storage: StorageService,
+    public auth: AuthService,
+  ) {}
 
   private fileName(): string {
     const d = new Date().toISOString().slice(0, 10);
@@ -27,15 +31,20 @@ export class ReglagesComponent {
   async exporter(): Promise<void> {
     const json = this.storage.exportJson();
     const blob = new Blob([json], { type: 'application/json' });
-    const file = new File([blob], this.fileName(), { type: 'application/json' });
+    const file = new File([blob], this.fileName(), {
+      type: 'application/json',
+    });
 
-    const nav = navigator as Navigator & { canShare?: (data: { files: File[] }) => boolean; share?: (data: unknown) => Promise<void> };
+    const nav = navigator as Navigator & {
+      canShare?: (data: { files: File[] }) => boolean;
+      share?: (data: unknown) => Promise<void>;
+    };
     if (nav.canShare && nav.share && nav.canShare({ files: [file] })) {
       try {
         await nav.share({
           files: [file],
           title: 'Export suivi salle',
-          text: 'Sauvegarde de mes séances de sport.'
+          text: 'Sauvegarde de mes séances de sport.',
         });
         this.message.set('Partage envoyé.');
         return;
@@ -44,7 +53,9 @@ export class ReglagesComponent {
       }
     }
     this.telecharger(blob);
-    this.message.set('Fichier téléchargé. Tu peux le joindre à un email depuis ton application de messagerie.');
+    this.message.set(
+      'Fichier téléchargé. Tu peux le joindre à un email depuis ton application de messagerie.',
+    );
   }
 
   private telecharger(blob: Blob): void {
@@ -56,23 +67,20 @@ export class ReglagesComponent {
     URL.revokeObjectURL(url);
   }
 
-  ouvrirEmail(): void {
-    const subject = encodeURIComponent('Sauvegarde suivi salle');
-    const body = encodeURIComponent(
-      "Le fichier de sauvegarde a été téléchargé sur l'appareil. N'oublie pas de le joindre à cet email avant de l'envoyer."
-    );
-    window.location.href = `mailto:?subject=${subject}&body=${body}`;
-  }
-
   onFichierChoisi(event: Event): void {
     const input = event.target as HTMLInputElement;
     const file = input.files?.[0];
     if (!file) return;
     const reader = new FileReader();
     reader.onload = async () => {
-      const result = await this.storage.importJson(String(reader.result), this.modeImport);
+      const result = await this.storage.importJson(
+        String(reader.result),
+        this.modeImport,
+      );
       if (result.ok) {
-        this.message.set(`Import réussi : ${result.count} séance(s) traitée(s).`);
+        this.message.set(
+          `Import réussi : ${result.count} séance(s) traitée(s).`,
+        );
       } else {
         this.message.set(`Erreur : ${result.error}`);
       }

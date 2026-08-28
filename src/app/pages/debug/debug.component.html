@@ -1,0 +1,29 @@
+<h1>Debug</h1>
+
+<div class="card">
+  <h3>Build</h3>
+  <p>Numéro de build : <strong>{{ buildNumber }}</strong></p>
+</div>
+
+<div class="card">
+  <h3>Mise à jour</h3>
+  @if (sw.updateAvailable()) {
+    <p class="muted">Une nouvelle version est disponible.</p>
+    <button type="button" class="btn btn-primary btn-block" (click)="sw.reload()">↻ Recharger avec la nouvelle version</button>
+  } @else {
+    <p class="muted">Aucune mise à jour détectée pour le moment.</p>
+    <button type="button" class="btn btn-primary btn-block" (click)="sw.forceUpdateCheck()">↻ Vérifier les mises à jour</button>
+  }
+</div>
+
+<div class="card">
+  <h3>Configuration</h3>
+  <dl>
+    <dt>emailRedirectTo</dt>
+    <dd><code>{{ emailRedirectTo }}</code></dd>
+    <dt>Supabase URL</dt>
+    <dd><code>{{ supabaseUrl }}</code></dd>
+    <dt>Utilisateur connecté</dt>
+    <dd>{{ auth.user()?.email ?? 'non connecté' }}</dd>
+  </dl>
+</div>
