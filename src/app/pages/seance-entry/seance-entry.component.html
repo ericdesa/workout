@@ -1,41 +1,23 @@
 <div class="page-header">
   <a routerLink="/accueil" class="back">← Séances</a>
   <h1>Nouvelle séance</h1>
-  <p class="muted">{{ aujourdhui | date: 'EEEE d MMMM' : '' : 'fr-FR' }}</p>
-  @if (saveStatus !== 'idle') {
+  <p class="muted">{{ aujourdhui | date: "EEEE d MMMM" : "" : "fr-FR" }}</p>
+  @if (saveStatus !== "idle") {
     <div class="save-status">
-      @if (saveStatus === 'saving') {
+      @if (saveStatus === "saving") {
         <span class="status-saving">⏳ Sauvegarde…</span>
       }
-      @if (saveStatus === 'saved') {
+      @if (saveStatus === "saved") {
         <span class="status-saved">✓ Sauvegardé</span>
       }
-      @if (saveStatus === 'error') {
-        <span class="status-error">✕ Échec de la sauvegarde — {{ saveError }}</span>
+      @if (saveStatus === "error") {
+        <span class="status-error"
+          >✕ Échec de la sauvegarde — {{ saveError }}</span
+        >
       }
     </div>
   }
 </div>
-
-<div class="card add-exercise-card">
-  <h3>Ajouter un exercice</h3>
-  @if (exercicesDisponibles.length > 0) {
-    <select (change)="ajouterExercice($any($event.target).value)">
-      <option value="">— Choisir un exercice —</option>
-      @for (ex of exercicesDisponibles; track ex.id) {
-        <option [value]="ex.id">{{ optionLabel(ex) }}</option>
-      }
-    </select>
-  } @else {
-    <p class="muted">Tous les exercices sont déjà dans la séance.</p>
-  }
-</div>
-
-@if (!rows.length) {
-  <div class="card empty-card">
-    <p class="empty-state">Aucun exercice ajouté pour l'instant.</p>
-  </div>
-}
 
 @for (row of rows; track row.exerciceId; let ri = $index) {
   <div class="card exercise-card" [class.exercise-done]="isDone(row)">
@@ -74,7 +56,7 @@
     <div class="sets-table">
       <div class="sets-row sets-row-head">
         <span>Série</span>
-        @if (row.type === 'musculation') {
+        @if (row.type === "musculation") {
           <span>Kg</span>
           <span>Reps</span>
         } @else {
@@ -86,7 +68,7 @@
       @for (set of row.sets; track $index; let si = $index) {
         <div class="sets-row">
           <span>{{ si + 1 }}</span>
-          @if (row.type === 'musculation') {
+          @if (row.type === "musculation") {
             <input
               type="number"
               inputmode="decimal"
@@ -164,6 +146,52 @@
       (ngModelChange)="scheduleAutoSave()"
       placeholder="Commentaire (optionnel)"
     />
+  </div>
+}
+
+@if (!showAddExercise) {
+  <div class="card add-exercise-card">
+    <button
+      type="button"
+      class="btn btn-block add-exercise-btn"
+      (click)="toggleAddExercise()"
+    >
+      + Ajouter un exercice
+    </button>
+  </div>
+}
+
+@if (showAddExercise) {
+  <div class="card add-exercise-form">
+    <h3>Ajouter un exercice</h3>
+    @if (exercicesDisponibles.length > 0) {
+      <select [(ngModel)]="selectedToAdd">
+        @for (ex of exercicesDisponibles; track ex.id) {
+          <option [ngValue]="ex.id">{{ optionLabel(ex) }}</option>
+        }
+      </select>
+    } @else {
+      <p class="muted">Tous les exercices sont déjà dans la séance.</p>
+    }
+    <div class="add-exercise-actions">
+      <button
+        type="button"
+        class="btn btn-primary"
+        (click)="ajouterExercice()"
+        [disabled]="!selectedToAdd"
+      >
+        Ajouter
+      </button>
+      <button type="button" class="btn" (click)="toggleAddExercise()">
+        Annuler
+      </button>
+    </div>
+  </div>
+}
+
+@if (!rows.length) {
+  <div class="card empty-card">
+    <p class="empty-state">Aucun exercice ajouté pour l'instant.</p>
   </div>
 }
 

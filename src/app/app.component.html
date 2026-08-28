@@ -4,7 +4,6 @@
     <nav class="nav-desktop">
       <a routerLink="/accueil" routerLinkActive="active">Séance</a>
       @if (userEmail()) {
-        <a routerLink="/historique" routerLinkActive="active">Historique</a>
         <a routerLink="/reglages" routerLinkActive="active">Réglages</a>
       } @else {
         <a routerLink="/debug" routerLinkActive="active">Debug</a>
@@ -26,9 +25,6 @@
       <span class="icon">🏠</span><span>Séance</span>
     </a>
     @if (userEmail()) {
-      <a routerLink="/historique" routerLinkActive="active">
-        <span class="icon">📅</span><span>Historique</span>
-      </a>
       <a routerLink="/reglages" routerLinkActive="active">
         <span class="icon">⚙️</span><span>Réglages</span>
       </a>

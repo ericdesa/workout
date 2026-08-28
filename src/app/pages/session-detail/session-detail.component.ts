@@ -1,15 +1,22 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { StorageService } from '../../services/storage.service';
-import { DIFFICULTE_LABELS, Difficulte, ExerciseLog, Exercise, SessionLog } from '../../models/fitness.model';
+import { StorageService, LastPerformance } from '../../services/storage.service';
+import {
+  DIFFICULTE_LABELS,
+  Difficulte,
+  ExerciseLog,
+  Exercise,
+  SessionLog,
+  SetRow,
+} from '../../models/fitness.model';
 
 @Component({
   selector: 'app-session-detail',
   standalone: true,
   imports: [FormsModule, RouterLink],
   templateUrl: './session-detail.component.html',
-  styleUrl: './session-detail.component.scss'
+  styleUrl: './session-detail.component.scss',
 })
 export class SessionDetailComponent implements OnInit, OnDestroy {
   session: SessionLog | null = null;
@@ -26,7 +33,11 @@ export class SessionDetailComponent implements OnInit, OnDestroy {
     Object.keys(DIFFICULTE_LABELS) as Difficulte[]
   ).map((value) => ({ value, label: DIFFICULTE_LABELS[value] }));
 
-  constructor(private route: ActivatedRoute, private router: Router, private storage: StorageService) {}
+  constructor(
+    private route: ActivatedRoute,
+    private router: Router,
+    private storage: StorageService,
+  ) {}
 
   ngOnInit(): void {
     const id = this.route.snapshot.paramMap.get('id')!;
@@ -64,7 +75,50 @@ export class SessionDetailComponent implements OnInit, OnDestroy {
   }
 
   isDone(ex: ExerciseLog): boolean {
-    return ex.sets.some((s) => s.kg !== null || s.reps !== null || s.distance !== null || s.dureeMin !== null || s.dureeSec !== null);
+    return ex.sets.some(
+      (s) =>
+        s.kg !== null ||
+        s.reps !== null ||
+        s.distance !== null ||
+        s.dureeMin !== null ||
+        s.dureeSec !== null,
+    );
+  }
+
+  dernierePerf(ex: ExerciseLog): LastPerformance | null {
+    return this.storage.getLastPerformance(ex.exerciceId, this.session?.id, this.session?.date);
+  }
+
+  setIsFilled(s: SetRow): boolean {
+    return (
+      s.kg !== null ||
+      s.reps !== null ||
+      s.distance !== null ||
+      s.dureeMin !== null ||
+      s.dureeSec !== null
+    );
+  }
+
+  perfResume(dernier: LastPerformance): string {
+    const log = dernier.log;
+    const sets = log.sets.filter((s) => this.setIsFilled(s));
+    if (log.type === 'cardio') {
+      const parts = sets.map((s) => {
+        const bits = [
+          s.distance != null ? `${s.distance} m` : null,
+          s.dureeMin != null ? `${s.dureeMin} min${s.dureeSec ? ' ' + s.dureeSec + ' s' : ''}` : null,
+        ].filter(Boolean);
+        return bits.join(' / ');
+      });
+      return parts.join(', ') || '—';
+    }
+    const setsTxt = sets.map((s) => `${s.kg ?? '?'}kg×${s.reps ?? '?'}`).join(', ');
+    return setsTxt || '—';
+  }
+
+  agoLabel(ago: number): string {
+    if (ago === 1) return 'il y a 1 séance';
+    return `il y a ${ago} séances`;
   }
 
   ajouterSerie(ex: ExerciseLog): void {
@@ -74,7 +128,7 @@ export class SessionDetailComponent implements OnInit, OnDestroy {
       reps: last?.reps ?? null,
       distance: last?.distance ?? null,
       dureeMin: last?.dureeMin ?? null,
-      dureeSec: last?.dureeSec ?? null
+      dureeSec: last?.dureeSec ?? null,
     });
     this.scheduleAutoSave();
   }
@@ -103,20 +157,37 @@ export class SessionDetailComponent implements OnInit, OnDestroy {
   }
 
   ajouterExercice(): void {
-    const ex = this.storage.exercices().find((e) => e.id === this.selectedToAdd);
+    const ex = this.storage
+      .exercices()
+      .find((e) => e.id === this.selectedToAdd);
     if (!ex) return;
-    const dernier = this.storage.getLastPerformance(ex.id, this.session!.id);
+    const dernier = this.storage.getLastPerformance(ex.id, this.session!.id, this.session!.date);
     const dernierSet = dernier?.log.sets.find(
-      (s) => s.kg !== null || s.reps !== null || s.distance !== null || s.dureeMin !== null || s.dureeSec !== null
+      (s) =>
+        s.kg !== null ||
+        s.reps !== null ||
+        s.distance !== null ||
+        s.dureeMin !== null ||
+        s.dureeSec !== null,
     );
     this.session!.exercices.push({
       exerciceId: ex.id,
       exerciceNom: ex.nom,
       type: ex.type,
       position: dernier?.log.position ?? null,
-      sets: [dernierSet ? { ...dernierSet } : { kg: null, reps: null, distance: null, dureeMin: null, dureeSec: null }],
+      sets: [
+        dernierSet
+          ? { ...dernierSet }
+          : {
+              kg: null,
+              reps: null,
+              distance: null,
+              dureeMin: null,
+              dureeSec: null,
+            },
+      ],
       difficulte: dernier?.log.difficulte ?? null,
-      commentaire: ''
+      commentaire: '',
     });
     this.showAddExercise = false;
     this.scheduleAutoSave();
@@ -130,7 +201,7 @@ export class SessionDetailComponent implements OnInit, OnDestroy {
       await this.storage.saveSession(this.session);
       this.saveStatus = 'saved';
       this.hasChanges = false;
-      this.router.navigate(['/historique']);
+      this.router.navigate(['/accueil']);
     } catch (e: any) {
       this.saveStatus = 'error';
       this.saveError = e?.message ?? 'Erreur réseau';
@@ -140,10 +211,15 @@ export class SessionDetailComponent implements OnInit, OnDestroy {
   async supprimer(): Promise<void> {
     if (!this.session) return;
     await this.storage.deleteSession(this.session.id);
-    this.router.navigate(['/historique']);
+    this.router.navigate(['/accueil']);
   }
 
   dateLongue(iso: string): string {
-    return new Date(iso).toLocaleDateString('fr-FR', { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' });
+    return new Date(iso).toLocaleDateString('fr-FR', {
+      weekday: 'long',
+      day: '2-digit',
+      month: 'long',
+      year: 'numeric',
+    });
   }
 }

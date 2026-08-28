@@ -14,7 +14,7 @@ interface MonthLabel {
 }
 
 const MOIS_COURT = ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Jun', 'Jul', 'Aoû', 'Sep', 'Oct', 'Nov', 'Déc'];
-const JOURS_COURT = ['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam'];
+const JOURS_COURT = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'];
 
 @Component({
   selector: 'app-contribution-graph',
@@ -60,7 +60,7 @@ export class ContributionGraphComponent implements OnChanges {
     start.setMonth(start.getMonth() - 5);
     start.setDate(1);
 
-    const paddingDays = start.getDay(); // 0 = dimanche
+    const paddingDays = (start.getDay() + 6) % 7; // 0 = lundi
     const lastOfEnd = new Date(this.endMonth.getFullYear(), this.endMonth.getMonth() + 1, 0);
 
     const cells: DayCell[] = [];

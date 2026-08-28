@@ -142,8 +142,12 @@ export class StorageService {
     return this.sessions().find((s) => s.id === id);
   }
 
-  getLastPerformance(exerciceId: string, excludeSessionId?: string): LastPerformance | null {
-    const list = this.sessions().filter((s) => s.id !== excludeSessionId);
+  getLastPerformance(exerciceId: string, excludeSessionId?: string, beforeDate?: string): LastPerformance | null {
+    const list = this.sessions().filter(
+      (s) =>
+        s.id !== excludeSessionId &&
+        (beforeDate == null || s.date <= beforeDate)
+    );
     for (let i = 0; i < list.length; i++) {
       const found = list[i].exercices.find((e) => e.exerciceId === exerciceId);
       if (found) {

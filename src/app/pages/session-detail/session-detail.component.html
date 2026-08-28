@@ -4,19 +4,24 @@
 
 @if (session; as s) {
   <div class="page-header">
-    <a routerLink="/historique" class="back">← Historique</a>
+    <a routerLink="/accueil" class="back">← Séances</a>
     <h1>Séance</h1>
     <p class="muted date-txt">{{ dateLongue(s.date) }}</p>
-    <input type="date" [(ngModel)]="s.date" (ngModelChange)="scheduleAutoSave()" class="date-input" />
-    @if (saveStatus !== 'idle') {
+    <input
+      type="date"
+      [(ngModel)]="s.date"
+      (ngModelChange)="scheduleAutoSave()"
+      class="date-input"
+    />
+    @if (saveStatus !== "idle") {
       <div class="save-status">
-        @if (saveStatus === 'saving') {
+        @if (saveStatus === "saving") {
           <span class="status-saving">⏳ Sauvegarde…</span>
         }
-        @if (saveStatus === 'saved') {
+        @if (saveStatus === "saved") {
           <span class="status-saved">✓ Sauvegardé</span>
         }
-        @if (saveStatus === 'error') {
+        @if (saveStatus === "error") {
           <span class="status-error">✕ Échec — {{ saveError }}</span>
         }
       </div>
@@ -29,9 +34,18 @@
         <h2>{{ ex.exerciceNom }}</h2>
         <div class="exercise-head-right">
           @if (ex.difficulte) {
-            <span class="pill" [class]="'pill-' + ex.difficulte">{{ difficulteLabels[ex.difficulte!] }}</span>
+            <span class="pill" [class]="'pill-' + ex.difficulte">{{
+              difficulteLabels[ex.difficulte!]
+            }}</span>
           }
-          <button type="button" class="icon-btn delete-exercise" (click)="supprimerExercice(ri)" aria-label="Supprimer l'exercice">✕</button>
+          <button
+            type="button"
+            class="icon-btn delete-exercise"
+            (click)="supprimerExercice(ri)"
+            aria-label="Supprimer l'exercice"
+          >
+            ✕
+          </button>
         </div>
       </div>
 
@@ -48,10 +62,17 @@
         />
       </div>
 
+      @if (dernierePerf(ex); as dernier) {
+        <p class="last-time">
+          🕓 Dernière perf : {{ perfResume(dernier) }}
+          <span class="ago-pill">{{ agoLabel(dernier.ago) }}</span>
+        </p>
+      }
+
       <div class="sets-table">
         <div class="sets-row sets-row-head">
           <span>Série</span>
-          @if (ex.type === 'musculation') {
+          @if (ex.type === "musculation") {
             <span>Kg</span>
             <span>Reps</span>
           } @else {
@@ -63,37 +84,96 @@
         @for (set of ex.sets; track $index; let si = $index) {
           <div class="sets-row">
             <span>{{ si + 1 }}</span>
-            @if (ex.type === 'musculation') {
-              <input type="number" step="0.5" min="0" [(ngModel)]="set.kg" (ngModelChange)="scheduleAutoSave()" placeholder="kg" />
-              <input type="number" min="0" [(ngModel)]="set.reps" (ngModelChange)="scheduleAutoSave()" placeholder="reps" />
+            @if (ex.type === "musculation") {
+              <input
+                type="number"
+                step="0.5"
+                min="0"
+                [(ngModel)]="set.kg"
+                (ngModelChange)="scheduleAutoSave()"
+                placeholder="kg"
+              />
+              <input
+                type="number"
+                min="0"
+                [(ngModel)]="set.reps"
+                (ngModelChange)="scheduleAutoSave()"
+                placeholder="reps"
+              />
             } @else {
-              <input type="number" inputmode="decimal" min="1" [(ngModel)]="set.distance" (ngModelChange)="scheduleAutoSave()" placeholder="m" />
+              <input
+                type="number"
+                inputmode="decimal"
+                min="1"
+                [(ngModel)]="set.distance"
+                (ngModelChange)="scheduleAutoSave()"
+                placeholder="m"
+              />
               <div class="duration-inputs">
-                <input type="number" inputmode="numeric" min="0" max="59" [(ngModel)]="set.dureeMin" (ngModelChange)="scheduleAutoSave()" placeholder="min" />
-                <input type="number" inputmode="numeric" min="0" max="59" [(ngModel)]="set.dureeSec" (ngModelChange)="scheduleAutoSave()" placeholder="s" />
+                <input
+                  type="number"
+                  inputmode="numeric"
+                  min="0"
+                  max="59"
+                  [(ngModel)]="set.dureeMin"
+                  (ngModelChange)="scheduleAutoSave()"
+                  placeholder="min"
+                />
+                <input
+                  type="number"
+                  inputmode="numeric"
+                  min="0"
+                  max="59"
+                  [(ngModel)]="set.dureeSec"
+                  (ngModelChange)="scheduleAutoSave()"
+                  placeholder="s"
+                />
               </div>
             }
-            <button type="button" class="icon-btn" (click)="retirerSerie(ex, si)">✕</button>
+            <button
+              type="button"
+              class="icon-btn"
+              (click)="retirerSerie(ex, si)"
+            >
+              ✕
+            </button>
           </div>
         }
       </div>
-      <button type="button" class="btn add-set" (click)="ajouterSerie(ex)">+ Série</button>
+      <button type="button" class="btn add-set" (click)="ajouterSerie(ex)">
+        + Série
+      </button>
 
       <div class="row-meta">
-        <select [(ngModel)]="ex.difficulte" (ngModelChange)="scheduleAutoSave()">
+        <select
+          [(ngModel)]="ex.difficulte"
+          (ngModelChange)="scheduleAutoSave()"
+        >
           <option [ngValue]="null">Difficulté ?</option>
           @for (d of difficulteOptions; track d.value) {
             <option [ngValue]="d.value">{{ d.label }}</option>
           }
         </select>
       </div>
-      <input type="text" class="comment-input" [(ngModel)]="ex.commentaire" (ngModelChange)="scheduleAutoSave()" placeholder="Commentaire" />
+      <input
+        type="text"
+        class="comment-input"
+        [(ngModel)]="ex.commentaire"
+        (ngModelChange)="scheduleAutoSave()"
+        placeholder="Commentaire"
+      />
     </div>
   }
 
   @if (!showAddExercise) {
     <div class="card add-exercise-card">
-      <button type="button" class="btn btn-block add-exercise-btn" (click)="toggleAddExercise()">+ Ajouter un exercice</button>
+      <button
+        type="button"
+        class="btn btn-block add-exercise-btn"
+        (click)="toggleAddExercise()"
+      >
+        + Ajouter un exercice
+      </button>
     </div>
   }
 
@@ -103,34 +183,68 @@
       @if (availableExercises().length > 0) {
         <select [(ngModel)]="selectedToAdd">
           @for (ex of availableExercises(); track ex.id) {
-            <option [ngValue]="ex.id">{{ ex.nom }} ({{ ex.type === 'musculation' ? 'Musculation' : 'Cardio' }})</option>
+            <option [ngValue]="ex.id">
+              {{ ex.nom }} ({{
+                ex.type === "musculation" ? "Musculation" : "Cardio"
+              }})
+            </option>
           }
         </select>
       } @else {
         <p class="muted">Tous les exercices sont déjà dans la séance.</p>
       }
       <div class="add-exercise-actions">
-        <button type="button" class="btn btn-primary" (click)="ajouterExercice()" [disabled]="!selectedToAdd">Ajouter</button>
-        <button type="button" class="btn" (click)="toggleAddExercise()">Annuler</button>
+        <button
+          type="button"
+          class="btn btn-primary"
+          (click)="ajouterExercice()"
+          [disabled]="!selectedToAdd"
+        >
+          Ajouter
+        </button>
+        <button type="button" class="btn" (click)="toggleAddExercise()">
+          Annuler
+        </button>
       </div>
     </div>
   }
 
   <div class="card">
     <h3>Notes de séance</h3>
-    <textarea rows="3" [(ngModel)]="s.notes" (ngModelChange)="scheduleAutoSave()"></textarea>
+    <textarea
+      rows="3"
+      [(ngModel)]="s.notes"
+      (ngModelChange)="scheduleAutoSave()"
+    ></textarea>
   </div>
 
   <div class="actions">
-    <button type="button" class="btn btn-primary btn-block" [disabled]="!hasChanges" (click)="enregistrer()">Enregistrer les modifications</button>
+    <button
+      type="button"
+      class="btn btn-primary btn-block"
+      [disabled]="!hasChanges"
+      (click)="enregistrer()"
+    >
+      Enregistrer les modifications
+    </button>
     @if (!confirmDelete) {
-      <button type="button" class="btn btn-danger btn-block" (click)="confirmDelete = true">Supprimer cette séance</button>
+      <button
+        type="button"
+        class="btn btn-danger btn-block"
+        (click)="confirmDelete = true"
+      >
+        Supprimer cette séance
+      </button>
     }
     @if (confirmDelete) {
       <div class="confirm-row">
         <span class="muted">Confirmer la suppression ?</span>
-        <button type="button" class="btn btn-danger" (click)="supprimer()">Oui, supprimer</button>
-        <button type="button" class="btn" (click)="confirmDelete = false">Annuler</button>
+        <button type="button" class="btn btn-danger" (click)="supprimer()">
+          Oui, supprimer
+        </button>
+        <button type="button" class="btn" (click)="confirmDelete = false">
+          Annuler
+        </button>
       </div>
     }
   </div>

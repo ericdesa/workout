@@ -28,6 +28,8 @@ export class SeanceEntryComponent implements OnDestroy {
   notes = '';
   saveStatus: 'idle' | 'saving' | 'saved' | 'error' = 'idle';
   saveError = '';
+  showAddExercise = false;
+  selectedToAdd = '';
   private sessionId = crypto.randomUUID();
   private autoSaveTimer: ReturnType<typeof setTimeout> | null = null;
   readonly aujourdhui = new Date();
@@ -126,8 +128,16 @@ export class SeanceEntryComponent implements OnDestroy {
     return row.sets.some((s) => this.setIsFilled(s));
   }
 
-  ajouterExercice(id: string): void {
-    const ex = this.storage.exercices().find((e) => e.id === id);
+  toggleAddExercise(): void {
+    this.showAddExercise = !this.showAddExercise;
+    if (this.showAddExercise) {
+      this.selectedToAdd = this.exercicesDisponibles[0]?.id ?? '';
+    }
+  }
+
+  ajouterExercice(): void {
+    if (!this.selectedToAdd) return;
+    const ex = this.storage.exercices().find((e) => e.id === this.selectedToAdd);
     if (!ex) return;
     const dernier = this.storage.getLastPerformance(ex.id, this.sessionId);
     const dernierSet = dernier?.log.sets.find((s) => this.setIsFilled(s));
@@ -141,6 +151,7 @@ export class SeanceEntryComponent implements OnDestroy {
       difficulte: dernier?.log.difficulte ?? null,
       commentaire: ''
     });
+    this.showAddExercise = false;
     this.scheduleAutoSave();
   }
 

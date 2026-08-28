@@ -22,11 +22,6 @@ export const routes: Routes = [
     canMatch: [authGuard]
   },
   {
-    path: 'historique',
-    loadComponent: () => import('./pages/history/history.component').then((m) => m.HistoryComponent),
-    canMatch: [authGuard]
-  },
-  {
     path: 'session/:id',
     loadComponent: () => import('./pages/session-detail/session-detail.component').then((m) => m.SessionDetailComponent),
     canMatch: [authGuard]

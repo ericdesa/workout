@@ -59,8 +59,8 @@
   width: 20px;
 }
 
-.day-labels span:nth-child(even) {
-  visibility: hidden;
+.day-labels span {
+  line-height: 14px;
 }
 
 .grid {
