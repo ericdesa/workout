@@ -49,6 +49,32 @@
   color: var(--accent);
 }
 
+.otp-form {
+  margin-top: 12px;
+}
+
+.otp-input {
+  width: 100%;
+  text-align: center;
+  font-size: 20px;
+  letter-spacing: 6px;
+  margin-bottom: 10px;
+}
+
+.link-btn {
+  margin-top: 10px;
+  background: none;
+  border: none;
+  color: var(--accent);
+  font-size: 13px;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.link-btn:disabled {
+  opacity: 0.6;
+}
+
 .spinner {
   display: inline-block;
   width: 14px;

@@ -12,6 +12,7 @@ import { AuthService } from '../../services/auth.service';
 })
 export class LoginComponent {
   email = '';
+  otpCode = '';
 
   constructor(public auth: AuthService, private router: Router) {
     effect(() => {
@@ -24,5 +25,10 @@ export class LoginComponent {
   async onSubmit(): Promise<void> {
     if (!this.email.trim()) return;
     await this.auth.signIn(this.email.trim());
+  }
+
+  async onOtpSubmit(): Promise<void> {
+    if (!this.email.trim() || !this.otpCode.trim()) return;
+    await this.auth.verifyOtp(this.email.trim(), this.otpCode);
   }
 }

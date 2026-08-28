@@ -49,6 +49,28 @@ export class AuthService {
     }
   }
 
+  async verifyOtp(email: string, token: string): Promise<void> {
+    this._error.set(null);
+    this._sending.set(true);
+    try {
+      const cleanToken = token.trim();
+      if (!cleanToken) {
+        this._error.set('Saisis le code reçu par email.');
+        return;
+      }
+      const { error } = await this.supabase.client.auth.verifyOtp({
+        email,
+        token: cleanToken,
+        type: 'magiclink'
+      });
+      if (error) {
+        this._error.set(error.message);
+      }
+    } finally {
+      this._sending.set(false);
+    }
+  }
+
   async signOut(): Promise<void> {
     await this.supabase.client.auth.signOut();
     this._user.set(null);

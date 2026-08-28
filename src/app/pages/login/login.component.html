@@ -36,8 +36,46 @@
       <div class="sent-notice">
         <p>📧 <strong>Lien envoyé !</strong></p>
         <p class="muted">
-          Vérifie ta boîte mail et clique sur le lien pour te connecter.
+          Vérifie ta boîte mail. Clique sur le lien <em>ou</em> colle le code
+          reçu ci-dessous si le lien ne s'ouvre pas.
         </p>
+
+        @if (auth.error()) {
+          <p class="error">{{ auth.error() }}</p>
+        }
+
+        <form (ngSubmit)="onOtpSubmit()" class="otp-form">
+          <input
+            type="text"
+            inputmode="numeric"
+            placeholder="Code à 6 chiffres"
+            [(ngModel)]="otpCode"
+            name="otp"
+            autocomplete="one-time-code"
+            class="otp-input"
+          />
+          <button
+            type="submit"
+            class="btn btn-primary btn-block"
+            [disabled]="auth.sending() || !otpCode.trim()"
+          >
+            @if (auth.sending()) {
+              <span class="spinner" aria-hidden="true"></span>
+              Connexion…
+            } @else {
+              Se connecter avec le code
+            }
+          </button>
+        </form>
+
+        <button
+          type="button"
+          class="link-btn"
+          (click)="auth.signIn(email.trim())"
+          [disabled]="auth.sending()"
+        >
+          Renvoyer le lien
+        </button>
       </div>
     }
   </div>
