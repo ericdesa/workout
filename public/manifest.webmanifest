@@ -1,8 +1,10 @@
 {
+  "id": "/workout/",
   "name": "Workout",
   "short_name": "Workout",
   "description": "Suivi de séances de sport en salle",
   "start_url": "/workout/",
+  "scope": "/workout/",
   "display": "standalone",
   "background_color": "#0f1115",
   "theme_color": "#4fd1a0",
