@@ -48,44 +48,36 @@
         />
       </div>
 
-      @if (ex.type === 'musculation') {
-        <div class="sets-table">
-          <div class="sets-row sets-row-head">
-            <span>Série</span>
+      <div class="sets-table">
+        <div class="sets-row sets-row-head">
+          <span>Série</span>
+          @if (ex.type === 'musculation') {
             <span>Kg</span>
             <span>Reps</span>
-            <span></span>
-          </div>
-          @for (set of ex.sets; track $index; let si = $index) {
-            <div class="sets-row">
-              <span>{{ si + 1 }}</span>
-              <input type="number" step="0.5" min="0" [(ngModel)]="set.kg" (ngModelChange)="scheduleAutoSave()" />
-              <input type="number" min="0" [(ngModel)]="set.reps" (ngModelChange)="scheduleAutoSave()" />
-              <button type="button" class="icon-btn" (click)="retirerSerie(ex, si)">✕</button>
-            </div>
+          } @else {
+            <span>Distance</span>
+            <span>Durée</span>
           }
+          <span></span>
         </div>
-        <button type="button" class="btn add-set" (click)="ajouterSerie(ex)">+ Série</button>
-      } @else {
-        <div class="cardio-inputs">
-          <div class="cardio-field">
-            <label>Distance</label>
-            <div class="input-with-unit">
-              <input type="number" inputmode="decimal" min="1" [(ngModel)]="ex.distance" (ngModelChange)="scheduleAutoSave()" placeholder="0" />
-              <span class="unit">m</span>
-            </div>
+        @for (set of ex.sets; track $index; let si = $index) {
+          <div class="sets-row">
+            <span>{{ si + 1 }}</span>
+            @if (ex.type === 'musculation') {
+              <input type="number" step="0.5" min="0" [(ngModel)]="set.kg" (ngModelChange)="scheduleAutoSave()" placeholder="kg" />
+              <input type="number" min="0" [(ngModel)]="set.reps" (ngModelChange)="scheduleAutoSave()" placeholder="reps" />
+            } @else {
+              <input type="number" inputmode="decimal" min="1" [(ngModel)]="set.distance" (ngModelChange)="scheduleAutoSave()" placeholder="m" />
+              <div class="duration-inputs">
+                <input type="number" inputmode="numeric" min="0" max="59" [(ngModel)]="set.dureeMin" (ngModelChange)="scheduleAutoSave()" placeholder="min" />
+                <input type="number" inputmode="numeric" min="0" max="59" [(ngModel)]="set.dureeSec" (ngModelChange)="scheduleAutoSave()" placeholder="s" />
+              </div>
+            }
+            <button type="button" class="icon-btn" (click)="retirerSerie(ex, si)">✕</button>
           </div>
-          <div class="cardio-field">
-            <label>Durée</label>
-            <div class="input-with-unit">
-              <input type="number" inputmode="numeric" min="0" max="59" [(ngModel)]="ex.dureeMin" (ngModelChange)="scheduleAutoSave()" placeholder="0" />
-              <span class="unit">min</span>
-              <input type="number" inputmode="numeric" min="0" max="59" [(ngModel)]="ex.dureeSec" (ngModelChange)="scheduleAutoSave()" placeholder="0" />
-              <span class="unit">s</span>
-            </div>
-          </div>
-        </div>
-      }
+        }
+      </div>
+      <button type="button" class="btn add-set" (click)="ajouterSerie(ex)">+ Série</button>
 
       <div class="row-meta">
         <select [(ngModel)]="ex.difficulte" (ngModelChange)="scheduleAutoSave()">

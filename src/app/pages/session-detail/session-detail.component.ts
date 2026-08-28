@@ -64,15 +64,18 @@ export class SessionDetailComponent implements OnInit, OnDestroy {
   }
 
   isDone(ex: ExerciseLog): boolean {
-    if (ex.type === 'cardio') {
-      return ex.distance != null || ex.dureeMin != null || ex.dureeSec != null;
-    }
-    return ex.sets.some((s) => s.kg != null || s.reps != null);
+    return ex.sets.some((s) => s.kg !== null || s.reps !== null || s.distance !== null || s.dureeMin !== null || s.dureeSec !== null);
   }
 
   ajouterSerie(ex: ExerciseLog): void {
     const last = ex.sets[ex.sets.length - 1];
-    ex.sets.push({ kg: last?.kg ?? null, reps: null });
+    ex.sets.push({
+      kg: last?.kg ?? null,
+      reps: last?.reps ?? null,
+      distance: last?.distance ?? null,
+      dureeMin: last?.dureeMin ?? null,
+      dureeSec: last?.dureeSec ?? null
+    });
     this.scheduleAutoSave();
   }
 
@@ -103,19 +106,15 @@ export class SessionDetailComponent implements OnInit, OnDestroy {
     const ex = this.storage.exercices().find((e) => e.id === this.selectedToAdd);
     if (!ex) return;
     const dernier = this.storage.getLastPerformance(ex.id, this.session!.id);
-    const dernierSet =
-      ex.type === 'musculation'
-        ? dernier?.log.sets.find((s) => s.kg !== null || s.reps !== null)
-        : undefined;
+    const dernierSet = dernier?.log.sets.find(
+      (s) => s.kg !== null || s.reps !== null || s.distance !== null || s.dureeMin !== null || s.dureeSec !== null
+    );
     this.session!.exercices.push({
       exerciceId: ex.id,
       exerciceNom: ex.nom,
       type: ex.type,
       position: dernier?.log.position ?? null,
-      sets: ex.type === 'musculation' ? [{ kg: dernierSet?.kg ?? null, reps: dernierSet?.reps ?? null }] : [],
-      distance: ex.type === 'cardio' ? dernier?.log.distance ?? null : null,
-      dureeMin: ex.type === 'cardio' ? dernier?.log.dureeMin ?? null : null,
-      dureeSec: ex.type === 'cardio' ? dernier?.log.dureeSec ?? null : null,
+      sets: [dernierSet ? { ...dernierSet } : { kg: null, reps: null, distance: null, dureeMin: null, dureeSec: null }],
       difficulte: dernier?.log.difficulte ?? null,
       commentaire: ''
     });

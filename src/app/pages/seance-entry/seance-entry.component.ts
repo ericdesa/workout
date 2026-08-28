@@ -3,7 +3,7 @@ import { Component, OnDestroy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { StorageService, LastPerformance } from '../../services/storage.service';
-import { Difficulte, DIFFICULTE_LABELS, Exercise, ExerciseLog, ExerciseType, SessionLog } from '../../models/fitness.model';
+import { Difficulte, DIFFICULTE_LABELS, Exercise, ExerciseLog, ExerciseType, SessionLog, SetRow } from '../../models/fitness.model';
 
 interface ExerciseFormRow {
   exerciceId: string;
@@ -11,10 +11,7 @@ interface ExerciseFormRow {
   type: ExerciseType;
   dernier: LastPerformance | null;
   position: number | null;
-  sets: { kg: number | null; reps: number | null }[];
-  distance: number | null;
-  dureeMin: number | null;
-  dureeSec: number | null;
+  sets: SetRow[];
   difficulte: Difficulte | null;
   commentaire: string;
 }
@@ -56,16 +53,23 @@ export class SeanceEntryComponent implements OnDestroy {
 
   perfResume(dernier: LastPerformance): string {
     const log = dernier.log;
+    const sets = log.sets.filter((s) => this.setIsFilled(s));
     if (log.type === 'cardio') {
-      const parts = [
-        log.distance != null ? `${log.distance} m` : null,
-        log.dureeMin != null ? `${log.dureeMin} min${log.dureeSec ? ' ' + log.dureeSec + ' s' : ''}` : null
-      ].filter(Boolean);
+      const parts = sets.map((s) => {
+        const bits = [
+          s.distance != null ? `${s.distance} m` : null,
+          s.dureeMin != null ? `${s.dureeMin} min${s.dureeSec ? ' ' + s.dureeSec + ' s' : ''}` : null
+        ].filter(Boolean);
+        return bits.join(' / ');
+      });
       return parts.join(', ') || '—';
     }
-    const sets = log.sets.filter((s) => s.kg !== null || s.reps !== null);
     const setsTxt = sets.map((s) => `${s.kg ?? '?'}kg×${s.reps ?? '?'}`).join(', ');
     return setsTxt || '—';
+  }
+
+  setIsFilled(s: SetRow): boolean {
+    return s.kg !== null || s.reps !== null || s.distance !== null || s.dureeMin !== null || s.dureeSec !== null;
   }
 
   agoLabel(ago: number): string {
@@ -103,12 +107,7 @@ export class SeanceEntryComponent implements OnDestroy {
       exerciceNom: r.exerciceNom,
       type: r.type,
       position: r.position,
-      sets: r.type === 'musculation'
-        ? r.sets.filter((s) => s.kg !== null || s.reps !== null)
-        : [],
-      distance: r.type === 'cardio' ? r.distance : null,
-      dureeMin: r.type === 'cardio' ? r.dureeMin : null,
-      dureeSec: r.type === 'cardio' ? r.dureeSec : null,
+      sets: r.sets.filter((s) => this.setIsFilled(s)),
       difficulte: r.difficulte,
       commentaire: r.commentaire.trim()
     }));
@@ -124,30 +123,21 @@ export class SeanceEntryComponent implements OnDestroy {
   }
 
   isDone(row: ExerciseFormRow): boolean {
-    if (row.type === 'cardio') {
-      return row.distance != null || row.dureeMin != null || row.dureeSec != null;
-    }
-    return row.sets.some((s) => s.kg != null || s.reps != null);
+    return row.sets.some((s) => this.setIsFilled(s));
   }
 
   ajouterExercice(id: string): void {
     const ex = this.storage.exercices().find((e) => e.id === id);
     if (!ex) return;
     const dernier = this.storage.getLastPerformance(ex.id, this.sessionId);
-    const dernierSet =
-      ex.type === 'musculation'
-        ? dernier?.log.sets.find((s) => s.kg !== null || s.reps !== null)
-        : undefined;
+    const dernierSet = dernier?.log.sets.find((s) => this.setIsFilled(s));
     this.rows.push({
       exerciceId: ex.id,
       exerciceNom: ex.nom,
       type: ex.type,
       dernier,
       position: dernier?.log.position ?? null,
-      sets: ex.type === 'musculation' ? [{ kg: dernierSet?.kg ?? null, reps: dernierSet?.reps ?? null }] : [],
-      distance: ex.type === 'cardio' ? dernier?.log.distance ?? null : null,
-      dureeMin: ex.type === 'cardio' ? dernier?.log.dureeMin ?? null : null,
-      dureeSec: ex.type === 'cardio' ? dernier?.log.dureeSec ?? null : null,
+      sets: [{ ...(dernierSet ?? { kg: null, reps: null, distance: null, dureeMin: null, dureeSec: null }) }],
       difficulte: dernier?.log.difficulte ?? null,
       commentaire: ''
     });
@@ -161,7 +151,13 @@ export class SeanceEntryComponent implements OnDestroy {
 
   ajouterSerie(row: ExerciseFormRow): void {
     const prev = row.sets.length ? row.sets[row.sets.length - 1] : null;
-    row.sets.push({ kg: prev?.kg ?? null, reps: prev?.reps ?? null });
+    row.sets.push({
+      kg: prev?.kg ?? null,
+      reps: prev?.reps ?? null,
+      distance: prev?.distance ?? null,
+      dureeMin: prev?.dureeMin ?? null,
+      dureeSec: prev?.dureeSec ?? null
+    });
     this.scheduleAutoSave();
   }
 

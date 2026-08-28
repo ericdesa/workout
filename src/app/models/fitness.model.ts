@@ -15,9 +15,12 @@ export const DIFFICULTE_LABELS: Record<Difficulte, string> = {
   tres_difficile: 'Très difficile'
 };
 
-export interface MuscuSet {
-  kg: number | null;
-  reps: number | null;
+export interface SetRow {
+  kg: number | null; // musculation : charge (kg)
+  reps: number | null; // musculation : répétitions
+  distance: number | null; // cardio : mètres
+  dureeMin: number | null; // cardio : minutes
+  dureeSec: number | null; // cardio : secondes
 }
 
 export interface ExerciseLog {
@@ -25,10 +28,7 @@ export interface ExerciseLog {
   exerciceNom: string;
   type: ExerciseType;
   position: number | null; // position de l'appareil (nombre)
-  sets: MuscuSet[]; // musculation : charge (kg) + répétitions
-  distance: number | null; // cardio : en mètres
-  dureeMin: number | null; // cardio : minutes
-  dureeSec: number | null; // cardio : secondes
+  sets: SetRow[];
   difficulte: Difficulte | null;
   commentaire: string;
 }

@@ -146,33 +146,15 @@ textarea {
   padding: 16px;
 }
 
-.cardio-inputs {
-  display: flex;
-  gap: 16px;
-  margin-top: 10px;
-}
-
-.cardio-field {
-  flex: 1;
-}
-
-.cardio-field label {
-  display: block;
-  font-size: 11px;
-  color: var(--text-muted);
-  text-transform: uppercase;
-  margin-bottom: 4px;
-}
-
-.input-with-unit {
-  display: flex;
-  align-items: center;
+.duration-inputs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
   gap: 6px;
 }
 
-.input-with-unit input {
-  flex: 1;
-  min-width: 48px;
+.duration-inputs input {
+  width: 100%;
+  padding: 8px 10px;
 }
 
 .exercise-head-actions {
