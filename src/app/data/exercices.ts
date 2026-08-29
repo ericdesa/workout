@@ -7,7 +7,15 @@ export const EXERCICES_INITIAUX: Exercise[] = [
   { id: 'abductor', nom: 'Abductor', type: 'musculation' },
   { id: 'prone-leg-curl', nom: 'Prone leg curl', type: 'musculation' },
   { id: 'total-abdominal', nom: 'Total abdominal', type: 'musculation' },
-  { id: 'tirage-vertical', nom: 'Tirage vertical poitrine', type: 'musculation' },
+  {
+    id: 'tirage-vertical',
+    nom: 'Tirage vertical poitrine',
+    type: 'musculation',
+  },
   { id: 'chest-press', nom: 'Chest press', type: 'musculation' },
-  { id: 'tapis', nom: 'Tapis', type: 'cardio' }
+  { id: 'tapis', nom: 'Tapis', type: 'cardio' },
+  { id: 'abdominal-crunch', nom: 'Abdominal crunch', type: 'musculation' },
+  { id: 'leg-extension', nom: 'Leg extension', type: 'musculation' },
+  { id: 'shoulder-press', nom: 'Shoulder press', type: 'musculation' },
+  { id: 'marche', nom: 'Marche', type: 'cardio' },
 ];
