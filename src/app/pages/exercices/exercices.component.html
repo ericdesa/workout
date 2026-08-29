@@ -1,7 +1,5 @@
 <h1>Exercices</h1>
-<p class="muted">
-  {{ muscuCount() }} musculation · {{ cardioCount() }} cardio
-</p>
+<p class="muted">{{ muscuCount() }} musculation · {{ cardioCount() }} cardio</p>
 
 <div class="card add-card">
   <h3>Nouvel exercice</h3>
@@ -36,29 +34,49 @@
       <li class="ex-row">
         @if (editing()?.id === ex.id) {
           <div class="edit-row">
-            <button type="button" class="delete-btn" (click)="supprimer(ex)" aria-label="Supprimer">✕</button>
+            <button
+              type="button"
+              class="delete-btn"
+              (click)="supprimer(ex)"
+              aria-label="Supprimer"
+            >
+              ✕
+            </button>
             <input type="text" [(ngModel)]="editing()!.nom" />
             <select [(ngModel)]="editing()!.type">
               <option value="musculation">Musculation</option>
               <option value="cardio">Cardio</option>
             </select>
             <div class="row-actions">
-              <button type="button" class="btn btn-primary" (click)="saveEdit()" [disabled]="saving()">✓</button>
-              <button type="button" class="btn" (click)="annulerEdit()">Annuler</button>
+              <button
+                type="button"
+                class="btn btn-primary"
+                (click)="saveEdit()"
+                [disabled]="saving()"
+              >
+                ✓
+              </button>
+              <button type="button" class="btn" (click)="annulerEdit()">
+                Annuler
+              </button>
             </div>
           </div>
         } @else {
           <span class="ex-main">
             <span class="ex-nom">{{ ex.nom }}</span>
-            <span class="pill" [class.muscu]="ex.type === 'musculation'" [class.cardio]="ex.type === 'cardio'">
-              {{ ex.type === 'musculation' ? 'Musculation' : 'Cardio' }}
-            </span>
           </span>
           <span class="recent" [title]="derniersIndicateurs()[ex.id].dates">
             {{ derniersIndicateurs()[ex.id].emojis }}
           </span>
           <div class="row-actions">
-            <button type="button" class="icon-btn" (click)="startEdit(ex)" aria-label="Modifier">✏️</button>
+            <button
+              type="button"
+              class="icon-btn"
+              (click)="startEdit(ex)"
+              aria-label="Modifier"
+            >
+              ✏️
+            </button>
           </div>
         }
       </li>

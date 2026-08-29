@@ -7,9 +7,9 @@
 .topbar {
   position: sticky;
   top: 0;
-  display: flex;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
   align-items: center;
-  justify-content: space-between;
   padding: calc(env(safe-area-inset-top) + 12px) 16px 12px;
   background: var(--surface);
   border-bottom: 1px solid var(--border);
@@ -17,10 +17,6 @@
 }
 
 .session-title {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -49,10 +45,6 @@
 }
 
 .page-title {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
   font-weight: 700;
   font-size: 15px;
 }
@@ -80,11 +72,24 @@
   cursor: pointer;
 }
 
+.center {
+  display: flex;
+  justify-content: center;
+  min-width: 0;
+}
+
 .settings-btn {
   font-size: 20px;
   text-decoration: none;
   padding: 4px;
   line-height: 1;
+  justify-self: end;
+}
+
+@media (max-width: 859px) {
+  .hide-mobile {
+    display: none;
+  }
 }
 
 .content {

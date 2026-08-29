@@ -1,7 +1,7 @@
 <div class="shell">
   <header class="topbar">
     <div class="brand">
-      @if (isSessionDetail()) {
+      @if (isSessionDetail() || isReglages()) {
         <button
           type="button"
           class="back-btn"
@@ -9,27 +9,33 @@
           aria-label="Retour"
         >‹</button>
       }
-      <a routerLink="/accueil" class="logo">🏋️ Workout</a>
+      <a
+        routerLink="/accueil"
+        class="logo"
+        [class.hide-mobile]="isSessionDetail() || isReglages()"
+      >🏋️ Workout</a>
     </div>
 
-    @if (isSessionDetail()) {
-      <div class="session-title" (click)="datePicker.showPicker()">
-        <span class="title">Séance</span>
-        @if (sessionContext.date(); as d) {
-          <span class="subtitle">{{ dateLongue(d) }}</span>
-        }
-        <input
-          #datePicker
-          type="date"
-          tabindex="-1"
-          [value]="sessionContext.date() ?? ''"
-          aria-label="Modifier la date"
-          (input)="changeDate($any($event.target).value)"
-        />
-      </div>
-    } @else if (isReglages()) {
-      <span class="page-title">Réglages</span>
-    }
+    <div class="center">
+      @if (isSessionDetail()) {
+        <div class="session-title" (click)="datePicker.showPicker()">
+          <span class="title">Séance</span>
+          @if (sessionContext.date(); as d) {
+            <span class="subtitle">{{ dateLongue(d) }}</span>
+          }
+          <input
+            #datePicker
+            type="date"
+            tabindex="-1"
+            [value]="sessionContext.date() ?? ''"
+            aria-label="Modifier la date"
+            (input)="changeDate($any($event.target).value)"
+          />
+        </div>
+      } @else if (isReglages()) {
+        <span class="page-title">Réglages</span>
+      }
+    </div>
 
     <a routerLink="/reglages" class="settings-btn" aria-label="Réglages">⚙️</a>
   </header>

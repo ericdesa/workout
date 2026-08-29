@@ -66,24 +66,6 @@
   white-space: nowrap;
 }
 
-.pill {
-  font-size: 11px;
-  padding: 3px 8px;
-  border-radius: 999px;
-  border: 1px solid var(--border);
-  color: var(--text-muted);
-}
-
-.pill.muscu {
-  color: var(--accent);
-  border-color: var(--accent);
-}
-
-.pill.cardio {
-  color: #ff9f43;
-  border-color: #ff9f43;
-}
-
 .row-actions {
   display: flex;
   gap: 4px;
