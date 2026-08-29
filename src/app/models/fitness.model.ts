@@ -39,8 +39,3 @@ export interface SessionLog {
   exercices: ExerciseLog[];
   notes: string;
 }
-
-export interface FitnessData {
-  version: 2;
-  sessions: SessionLog[];
-}

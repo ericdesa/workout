@@ -32,7 +32,6 @@ export class SessionDetailComponent implements OnDestroy {
   saveError = '';
   hasChanges = false;
   private autoSaveTimer: ReturnType<typeof setTimeout> | null = null;
-  readonly difficulteLabels = DIFFICULTE_LABELS;
   readonly difficulteOptions: { value: Difficulte; label: string }[] = (
     Object.keys(DIFFICULTE_LABELS) as Difficulte[]
   ).map((value) => ({ value, label: DIFFICULTE_LABELS[value] }));

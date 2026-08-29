@@ -19,8 +19,6 @@ export class SeanceSelectComponent {
 
   readonly streak = computed(() => this.computeStreakSemaines());
 
-  readonly aujourdhui = new Date();
-
   constructor(
     private storage: StorageService,
     private router: Router,
@@ -28,13 +26,6 @@ export class SeanceSelectComponent {
 
   nouvelleSeance(): void {
     this.router.navigate(['/seance']);
-  }
-
-  dateCourte(iso: string): string {
-    return new Date(iso).toLocaleDateString('fr-FR', {
-      day: '2-digit',
-      month: 'short',
-    });
   }
 
   dateLongue(iso: string): string {

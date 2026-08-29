@@ -9,10 +9,6 @@ export class SessionContextService {
     this.onChange = onChange;
   }
 
-  unregister(): void {
-    this.onChange = null;
-  }
-
   setDate(date: string | null): void {
     this.date.set(date);
   }

@@ -27,40 +27,6 @@
   opacity: 0.8;
 }
 
-.recent-row {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 8px 0;
-  border-top: 1px solid var(--border);
-  text-decoration: none;
-  cursor: pointer;
-  font-size: 14px;
-}
-
-.recent-row:first-of-type {
-  border-top: none;
-}
-
-.recent-row .date {
-  font-weight: 700;
-}
-
-.recent-row .muted {
-  color: var(--text-muted);
-  font-size: 12px;
-}
-
-.recent-row .first-ex {
-  margin-left: auto;
-  color: var(--text-muted);
-  font-size: 13px;
-  max-width: 45%;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
 .streak {
   margin: 10px 0 0;
   font-size: 13px;
