@@ -36,6 +36,7 @@
       <li class="ex-row">
         @if (editing()?.id === ex.id) {
           <div class="edit-row">
+            <button type="button" class="delete-btn" (click)="supprimer(ex)" aria-label="Supprimer">✕</button>
             <input type="text" [(ngModel)]="editing()!.nom" />
             <select [(ngModel)]="editing()!.type">
               <option value="musculation">Musculation</option>
@@ -47,13 +48,17 @@
             </div>
           </div>
         } @else {
-          <span class="ex-nom">{{ ex.nom }}</span>
-          <span class="pill" [class.muscu]="ex.type === 'musculation'" [class.cardio]="ex.type === 'cardio'">
-            {{ ex.type === 'musculation' ? 'Musculation' : 'Cardio' }}
+          <span class="ex-main">
+            <span class="ex-nom">{{ ex.nom }}</span>
+            <span class="pill" [class.muscu]="ex.type === 'musculation'" [class.cardio]="ex.type === 'cardio'">
+              {{ ex.type === 'musculation' ? 'Musculation' : 'Cardio' }}
+            </span>
+          </span>
+          <span class="recent" [title]="derniersIndicateurs()[ex.id].dates">
+            {{ derniersIndicateurs()[ex.id].emojis }}
           </span>
           <div class="row-actions">
             <button type="button" class="icon-btn" (click)="startEdit(ex)" aria-label="Modifier">✏️</button>
-            <button type="button" class="icon-btn danger" (click)="supprimer(ex)" aria-label="Supprimer">✕</button>
           </div>
         }
       </li>

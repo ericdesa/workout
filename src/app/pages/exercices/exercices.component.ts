@@ -25,6 +25,29 @@ export class ExercicesComponent {
   readonly muscuCount = computed(() => this.exercices().filter((e) => e.type === 'musculation').length);
   readonly cardioCount = computed(() => this.exercices().filter((e) => e.type === 'cardio').length);
 
+  readonly derniersIndicateurs = computed(() => {
+    const sessions = this.storage.sessions().slice(0, 5);
+    const map: Record<string, { emojis: string; dates: string }> = {};
+    for (const ex of this.exercices()) {
+      map[ex.id] = {
+        emojis: sessions
+          .map((s) =>
+            s.exercices.some((e) => e.exerciceId === ex.id) ? '🟩' : '⬜',
+          )
+          .join(' '),
+        dates: sessions.map((s) => this.dateCourte(s.date)).join(' · '),
+      };
+    }
+    return map;
+  });
+
+  private dateCourte(iso: string): string {
+    return new Date(iso).toLocaleDateString('fr-FR', {
+      day: '2-digit',
+      month: '2-digit',
+    });
+  }
+
   newNom = '';
   newType: ExerciseType = 'musculation';
   editing = signal<EditingRow | null>(null);

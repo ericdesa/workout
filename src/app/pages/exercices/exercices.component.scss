@@ -45,9 +45,25 @@
   border-bottom: none;
 }
 
-.ex-nom {
+.ex-main {
   flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.ex-nom {
   font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.recent {
+  font-size: 12px;
+  letter-spacing: 1px;
+  white-space: nowrap;
 }
 
 .pill {
@@ -84,6 +100,20 @@
 
 .icon-btn.danger {
   color: var(--danger);
+}
+
+.delete-btn {
+  background: var(--danger);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  width: 42px;
+  height: 42px;
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .edit-row {

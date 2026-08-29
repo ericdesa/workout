@@ -7,11 +7,6 @@
 
 <div class="card">
   <app-contribution-graph [activeDates]="activeDates()" />
-  @if (streak() > 1) {
-    <p class="streak">
-      🔥 {{ streak() }} semaines de suite avec au moins une séance
-    </p>
-  }
 </div>
 
 @if (!sessions().length) {
