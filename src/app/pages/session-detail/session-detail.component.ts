@@ -1,7 +1,8 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { StorageService, LastPerformance } from '../../services/storage.service';
+import { SessionContextService } from '../../services/session-context.service';
 import {
   DIFFICULTE_LABELS,
   Difficulte,
@@ -14,7 +15,7 @@ import {
 @Component({
   selector: 'app-session-detail',
   standalone: true,
-  imports: [FormsModule, RouterLink],
+  imports: [FormsModule],
   templateUrl: './session-detail.component.html',
   styleUrl: './session-detail.component.scss',
 })
@@ -37,6 +38,7 @@ export class SessionDetailComponent implements OnInit, OnDestroy {
     private route: ActivatedRoute,
     private router: Router,
     private storage: StorageService,
+    private sessionContext: SessionContextService,
   ) {}
 
   ngOnInit(): void {
@@ -48,10 +50,18 @@ export class SessionDetailComponent implements OnInit, OnDestroy {
     }
     this.session = JSON.parse(JSON.stringify(found));
     this.selectedToAdd = this.availableExercises()[0]?.id ?? '';
+    const session = this.session!;
+    this.sessionContext.register((date) => {
+      session.date = date;
+      this.sessionContext.setDate(date);
+      this.scheduleAutoSave();
+    });
+    this.sessionContext.setDate(session.date);
   }
 
   ngOnDestroy(): void {
     if (this.autoSaveTimer) clearTimeout(this.autoSaveTimer);
+    this.sessionContext.clear();
   }
 
   scheduleAutoSave(): void {
@@ -212,14 +222,5 @@ export class SessionDetailComponent implements OnInit, OnDestroy {
     if (!this.session) return;
     await this.storage.deleteSession(this.session.id);
     this.router.navigate(['/accueil']);
-  }
-
-  dateLongue(iso: string): string {
-    return new Date(iso).toLocaleDateString('fr-FR', {
-      weekday: 'long',
-      day: '2-digit',
-      month: 'long',
-      year: 'numeric',
-    });
   }
 }

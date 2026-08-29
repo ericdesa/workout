@@ -1,5 +1,4 @@
 import { Component, signal } from '@angular/core';
-import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { StorageService } from '../../services/storage.service';
 import { AuthService } from '../../services/auth.service';
@@ -8,7 +7,7 @@ import { ExercicesComponent } from '../exercices/exercices.component';
 @Component({
   selector: 'app-reglages',
   standalone: true,
-  imports: [FormsModule, RouterLink, ExercicesComponent],
+  imports: [RouterLink, ExercicesComponent],
   templateUrl: './reglages.component.html',
   styleUrl: './reglages.component.scss',
 })
@@ -17,7 +16,7 @@ export class ReglagesComponent {
   readonly userEmail = () => this.auth.user()?.email ?? '';
   message = signal<string | null>(null);
   confirmReset = false;
-  modeImport: 'fusionner' | 'remplacer' = 'fusionner';
+  confirmLogout = false;
 
   constructor(
     private storage: StorageService,
@@ -47,16 +46,12 @@ export class ReglagesComponent {
           title: 'Export suivi salle',
           text: 'Sauvegarde de mes séances de sport.',
         });
-        this.message.set('Partage envoyé.');
         return;
       } catch {
         // l'utilisateur a annulé le partage, on retombe sur le téléchargement
       }
     }
     this.telecharger(blob);
-    this.message.set(
-      'Fichier téléchargé. Tu peux le joindre à un email depuis ton application de messagerie.',
-    );
   }
 
   private telecharger(blob: Blob): void {
@@ -76,7 +71,7 @@ export class ReglagesComponent {
     reader.onload = async () => {
       const result = await this.storage.importJson(
         String(reader.result),
-        this.modeImport,
+        'remplacer',
       );
       if (result.ok) {
         this.message.set(
@@ -97,6 +92,7 @@ export class ReglagesComponent {
   }
 
   async deconnexion(): Promise<void> {
+    this.confirmLogout = false;
     await this.auth.signOut();
   }
 }

@@ -1,90 +1,82 @@
-<h1>Réglages</h1>
-<p class="muted">
-  {{ nbSessions() }} séance(s) enregistrée(s) — données synchronisées avec le
-  cloud.
-</p>
-
 <app-exercices />
 
 <div class="card">
+  <h3>Données</h3>
+  <p class="subtitle">{{ nbSessions() }} séance(s) enregistrée(s)</p>
+  <div class="data-actions">
+    <button type="button" class="btn" (click)="exporter()">⬆️ Exporter</button>
+    <label class="file-btn btn">
+      📥 Importer
+      <input
+        type="file"
+        accept="application/json,.json"
+        (change)="onFichierChoisi($event)"
+        hidden
+      />
+    </label>
+  </div>
+</div>
+
+<div class="card">
   <h3>Compte</h3>
-  <p>
+  <p class="subtitle">
     Connecté en tant que <strong>{{ userEmail() }}</strong>
   </p>
-  <button type="button" class="btn btn-block" (click)="deconnexion()">
-    Se déconnecter
-  </button>
-</div>
 
-<div class="card">
-  <h3>Exporter</h3>
-  <p>
-    Génère un fichier JSON de toutes tes séances, à partager ou joindre par
-    email pour le sauvegarder.
-  </p>
-  <button type="button" class="btn btn-primary btn-block" (click)="exporter()">
-    ⬆️ Exporter mes données
-  </button>
-</div>
-
-<div class="card">
-  <h3>Importer</h3>
-  <p>Restaure des séances depuis un fichier JSON précédemment exporté.</p>
-  <div class="import-mode">
-    <label
-      ><input
-        type="radio"
-        name="mode"
-        value="fusionner"
-        [(ngModel)]="modeImport"
-      />
-      Fusionner avec les données actuelles</label
-    >
-    <label
-      ><input
-        type="radio"
-        name="mode"
-        value="remplacer"
-        [(ngModel)]="modeImport"
-      />
-      Remplacer toutes les données</label
-    >
-  </div>
-  <label class="file-btn btn btn-block">
-    📥 Choisir un fichier JSON
-    <input
-      type="file"
-      accept="application/json,.json"
-      (change)="onFichierChoisi($event)"
-      hidden
-    />
-  </label>
-</div>
-
-<div class="card">
-  <h3>Réinitialiser</h3>
-  <p>Supprime définitivement toutes les séances enregistrées dans le cloud.</p>
-  @if (!confirmReset) {
+  <div class="account-actions">
     <button
       type="button"
       class="btn btn-danger btn-block"
+      (click)="confirmLogout = true"
+    >
+      Se déconnecter
+    </button>
+    <button
+      type="button"
+      class="btn btn-block reset"
       (click)="confirmReset = true"
     >
-      Tout supprimer
+      Supprimer mon compte
     </button>
-  }
-  @if (confirmReset) {
-    <div class="confirm-row">
-      <span class="muted">Confirmer ?</span>
-      <button type="button" class="btn btn-danger" (click)="reinitialiser()">
-        Oui, supprimer
-      </button>
-      <button type="button" class="btn" (click)="confirmReset = false">
-        Annuler
-      </button>
-    </div>
-  }
+  </div>
 </div>
+
+@if (confirmReset) {
+  <div class="modal-overlay" (click)="confirmReset = false">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <h3 class="modal-title">Supprimer toutes les données ?</h3>
+      <p>
+        Cette action est irréversible. Toutes les séances enregistrées dans le
+        cloud seront supprimées.
+      </p>
+      <div class="modal-actions">
+        <button type="button" class="btn" (click)="confirmReset = false">
+          Annuler
+        </button>
+        <button type="button" class="btn btn-danger" (click)="reinitialiser()">
+          Supprimer
+        </button>
+      </div>
+    </div>
+  </div>
+}
+
+@if (confirmLogout) {
+  <div class="modal-overlay" (click)="confirmLogout = false">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <h3 class="modal-title">Se déconnecter ?</h3>
+      <p>Tu devras te reconnecter pour accéder à tes séances.</p>
+      <div class="modal-actions">
+        <button type="button" class="btn" (click)="confirmLogout = false">
+          Annuler
+        </button>
+        <button type="button" class="btn btn-danger" (click)="deconnexion()">
+          Se déconnecter
+        </button>
+      </div>
+    </div>
+  </div>
+}
 
 @if (message()) {
   <p class="message">{{ message() }}</p>

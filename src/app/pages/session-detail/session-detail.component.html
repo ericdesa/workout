@@ -3,41 +3,25 @@
 }
 
 @if (session; as s) {
-  <div class="page-header">
-    <a routerLink="/accueil" class="back">← Séances</a>
-    <h1>Séance</h1>
-    <p class="muted date-txt">{{ dateLongue(s.date) }}</p>
-    <input
-      type="date"
-      [(ngModel)]="s.date"
-      (ngModelChange)="scheduleAutoSave()"
-      class="date-input"
-    />
-    @if (saveStatus !== "idle") {
-      <div class="save-status">
-        @if (saveStatus === "saving") {
-          <span class="status-saving">⏳ Sauvegarde…</span>
-        }
-        @if (saveStatus === "saved") {
-          <span class="status-saved">✓ Sauvegardé</span>
-        }
-        @if (saveStatus === "error") {
-          <span class="status-error">✕ Échec — {{ saveError }}</span>
-        }
-      </div>
-    }
-  </div>
+  @if (saveStatus !== "idle") {
+    <div class="save-status">
+      @if (saveStatus === "saving") {
+        <span class="status-saving">⏳ Sauvegarde…</span>
+      }
+      @if (saveStatus === "saved") {
+        <span class="status-saved">✓ Sauvegardé</span>
+      }
+      @if (saveStatus === "error") {
+        <span class="status-error">✕ Échec — {{ saveError }}</span>
+      }
+    </div>
+  }
 
   @for (ex of s.exercices; track ex.exerciceId; let ri = $index) {
     <div class="card exercise-card" [class.exercise-done]="isDone(ex)">
       <div class="exercise-head">
         <h2>{{ ex.exerciceNom }}</h2>
         <div class="exercise-head-right">
-          @if (ex.difficulte) {
-            <span class="pill" [class]="'pill-' + ex.difficulte">{{
-              difficulteLabels[ex.difficulte!]
-            }}</span>
-          }
           <button
             type="button"
             class="icon-btn delete-exercise"
@@ -145,15 +129,18 @@
       </button>
 
       <div class="row-meta">
-        <select
-          [(ngModel)]="ex.difficulte"
-          (ngModelChange)="scheduleAutoSave()"
-        >
-          <option [ngValue]="null">Difficulté ?</option>
-          @for (d of difficulteOptions; track d.value) {
-            <option [ngValue]="d.value">{{ d.label }}</option>
-          }
-        </select>
+        <label class="difficulte-select">
+          <select
+            [(ngModel)]="ex.difficulte"
+            (ngModelChange)="scheduleAutoSave()"
+            [class]="ex.difficulte ? 'pill-selected pill-' + ex.difficulte : ''"
+          >
+            <option [ngValue]="null">Difficulté ?</option>
+            @for (d of difficulteOptions; track d.value) {
+              <option [ngValue]="d.value">{{ d.label }}</option>
+            }
+          </select>
+        </label>
       </div>
       <input
         type="text"

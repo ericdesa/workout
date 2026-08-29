@@ -21,11 +21,71 @@
   text-align: center;
 }
 
-.confirm-row {
+.subtitle {
+  margin: 0 0 12px;
+  font-size: 14px;
+  color: var(--text);
+}
+
+.data-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.data-actions .btn {
+  flex: 1;
+}
+
+.account-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.reset {
+  color: var(--text-muted);
+  background: transparent;
+  border-color: var(--border);
+  font-size: 15px;
+  padding: 12px 18px;
+}
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
   display: flex;
   align-items: center;
-  gap: 10px;
-  flex-wrap: wrap;
+  justify-content: center;
+  padding: 24px;
+  z-index: 100;
+}
+
+.modal {
+  width: 100%;
+  max-width: 400px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+}
+
+.modal-title {
+  font-size: 16px;
+  text-transform: none;
+  letter-spacing: normal;
+  color: var(--text);
+  margin-bottom: 8px;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.modal-actions .btn {
+  flex: 1;
 }
 
 .message {

@@ -1,17 +1,7 @@
-.page-header {
-  margin-bottom: 16px;
-}
-
-.back {
-  text-decoration: none;
-  color: var(--text-muted);
-  font-size: 13px;
-}
-
 .save-status {
-  margin-top: 6px;
   font-size: 13px;
   font-weight: 600;
+  margin-bottom: 12px;
 }
 
 .status-saving {
@@ -24,16 +14,6 @@
 
 .status-error {
   color: var(--danger);
-}
-
-.date-txt {
-  text-transform: capitalize;
-  margin-bottom: 4px;
-}
-
-.date-input {
-  font-size: 13px;
-  padding: 6px 8px;
 }
 
 .exercise-card {
@@ -196,6 +176,10 @@
   gap: 8px;
   align-items: center;
   margin-bottom: 6px;
+
+  input {
+    width: 100%;
+  }
 }
 
 .sets-row-head {
@@ -226,9 +210,48 @@
   flex-wrap: wrap;
 }
 
-.row-meta select {
+.difficulte-select {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.meta-label {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.difficulte-select select {
   flex: 1;
   min-width: 120px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+}
+
+.pill-selected {
+  border-color: var(--accent);
+}
+
+.difficulte-select select.pill-facile {
+  color: var(--accent);
+  border-color: var(--accent);
+  outline-color: var(--accent);
+}
+
+.difficulte-select select.pill-difficile {
+  color: var(--warning);
+  border-color: var(--warning);
+  outline-color: var(--warning);
+}
+
+.difficulte-select select.pill-tres_difficile {
+  color: var(--danger);
+  border-color: var(--danger);
+  outline-color: var(--danger);
 }
 
 .comment-input {
