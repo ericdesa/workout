@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnDestroy, effect, untracked, EffectRef, ChangeDetectorRef } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { StorageService, LastPerformance } from '../../services/storage.service';
@@ -19,9 +19,12 @@ import {
   templateUrl: './session-detail.component.html',
   styleUrl: './session-detail.component.scss',
 })
-export class SessionDetailComponent implements OnInit, OnDestroy {
+export class SessionDetailComponent implements OnDestroy {
   session: SessionLog | null = null;
   notFound = false;
+  private initialized = false;
+  private loadTriggered = false;
+  private lookUpEffect: EffectRef;
   confirmDelete = false;
   showAddExercise = false;
   selectedToAdd = '';
@@ -39,27 +42,47 @@ export class SessionDetailComponent implements OnInit, OnDestroy {
     private router: Router,
     private storage: StorageService,
     private sessionContext: SessionContextService,
-  ) {}
-
-  ngOnInit(): void {
+    private cdr: ChangeDetectorRef,
+  ) {
     const id = this.route.snapshot.paramMap.get('id')!;
-    const found = this.storage.getSession(id);
-    if (!found) {
-      this.notFound = true;
-      return;
-    }
-    this.session = JSON.parse(JSON.stringify(found));
-    this.selectedToAdd = this.availableExercises()[0]?.id ?? '';
-    const session = this.session!;
-    this.sessionContext.register((date) => {
-      session.date = date;
-      this.sessionContext.setDate(date);
-      this.scheduleAutoSave();
+    this.lookUpEffect = effect(() => {
+      if (this.initialized) return;
+      const loaded = this.storage.sessionsLoaded();
+      if (!loaded && !this.loadTriggered) {
+        this.loadTriggered = true;
+        untracked(() => {
+          this.storage.loadSessions().catch(() => {});
+        });
+        return;
+      }
+      if (!loaded) return;
+      const list = this.storage.sessions();
+      const found = list.find((s) => s.id === id);
+      if (found) {
+        this.initialized = true;
+        untracked(() => {
+          this.session = JSON.parse(JSON.stringify(found));
+          this.cdr.detectChanges();
+          this.selectedToAdd = this.availableExercises()[0]?.id ?? '';
+          const session = this.session!;
+          this.sessionContext.register((date) => {
+            session.date = date;
+            this.sessionContext.setDate(date);
+            this.scheduleAutoSave();
+          });
+          this.sessionContext.setDate(session.date);
+        });
+      } else {
+        this.initialized = true;
+        untracked(() => {
+          this.notFound = true;
+        });
+      }
     });
-    this.sessionContext.setDate(session.date);
   }
 
   ngOnDestroy(): void {
+    this.lookUpEffect.destroy();
     if (this.autoSaveTimer) clearTimeout(this.autoSaveTimer);
     this.sessionContext.clear();
   }

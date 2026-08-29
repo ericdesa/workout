@@ -14,6 +14,7 @@ export interface LastPerformance {
 export class StorageService {
   readonly sessions = signal<SessionLog[]>([]);
   readonly exercices = signal<Exercise[]>([]);
+  readonly sessionsLoaded = signal(false);
 
   constructor(private supabase: SupabaseService, private auth: AuthService) {}
 
@@ -38,6 +39,7 @@ export class StorageService {
         notes: row.notes ?? ''
       }))
     );
+    this.sessionsLoaded.set(true);
   }
 
   async loadExercices(): Promise<void> {

@@ -40,6 +40,7 @@ export class AppComponent {
           ]);
         } else {
           this.storage.sessions.set([]);
+          this.storage.sessionsLoaded.set(false);
           this.storage.exercices.set([]);
           if (event === 'SIGNED_OUT') {
             this.router.navigate(['/login']);
